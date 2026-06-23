@@ -1,46 +1,38 @@
-# Metric Audit: Validating Internal Representations in Neural Networks
+# The Marginal Baseline Eval (MBE)
 
-This repository contains the complete experimental code, raw results, and formal theory behind the negative result on the Configurational Exposure Index (CEI) and its parameter-space successor, Gradient Effective Rank ($\text{FIM}_{norm}$).
+Welcome to the **Marginal Baseline Eval (MBE)** repository! 
 
-## The Premise
-We set out to operationalize the **Structural Homeostasis Hypothesis (SHH)** for deep learning. We hypothesized that networks that generalize well maintain a bounded internal interaction complexity during training. We designed $\text{FIM}_{norm}$ to track this.
+This repository provides the formal implementation of the MBE protocol—a strict, 4-stage validation methodology designed to rigorously audit representation metrics in deep neural networks. 
 
-It passed every standard test—including rigorous orthogonal label-noise and capacity probes across MLPs, CNNs, and Transformers. **But it decisively failed a strict partial-correlation baseline control against early validation loss.**
+It was originally built during a massive case study that mathematically falsified the Gradient Effective Rank ($\text{FIM}_{norm}$) metric.
 
-This repository is an open case study in why AI safety metrics must be audited against trivial baselines.
+## Why Do We Need MBE?
+The AI safety and interpretability communities frequently propose internal structural metrics (e.g., representation geometry, effective rank, gradient coherence) to predict generalization or track model health. 
 
-## Repository Structure
+However, many of these metrics are secretly **Loss Proxies**. Because early validation loss trivially predicts final test accuracy, any metric that mathematically correlates with the *magnitude* of the loss will automatically correlate with generalization. Such a metric provides **zero independent structural insight**.
 
-### `metric_audit/`
-Contains the core measurement logic.
-- `sci_tracker.py`: Computes the effective rank of activation covariance (CEI) and gradient duals ($\text{FIM}_{norm}$) across network layers.
+The MBE protocol is designed to catch these false positive metrics using a rigorous partial-correlation baseline control.
 
-### `experiments/`
-The 12-test validation suite that systematically validated, and then killed, the metric.
-- **`01_acid_tests/`**: The dual acid test on MLPs (label noise vs. capacity) and stability analysis.
-- **`02_architectures/`**: Cross-architecture tests to verify immunity to normalization artifacts (CNN+BatchNorm, Transformer+LayerNorm).
-- **`03_comparisons/`**: Baseline comparisons against Trace Norm, Sharpness (SAM), and Bootstrap Confidence Intervals.
-- **`04_falsification/`**: The decisive falsification tests. `fim_early_predictor.py` (Test 11) runs the loss-baseline partial correlation control. `fim_init_test.py` (Test 12) proves the metric is null at initialization.
+## Quickstart: The Sample Eval
+We provide a plug-and-play python script that simulates exactly how MBE detects a disguised loss proxy. 
 
-### `docs/`
-- `FINDINGS.md`: The master ledger of all experiments, falsifications, and the final conclusion.
-- `RESULTS.md`: Raw numerical output, statistical correlations, and data tables for the 12 tests.
-- `theory.md`: The mathematical derivations for $\text{FIM}_{norm}$, moving from activation space to parameter space.
-
-## The `metric-audit` Methodology
-We propose the validation sequence found in this repository as a standard for new internal metrics:
-1. **Dual Acid Test:** Does the metric track capability (capacity) and degradation (noise) consistently?
-2. **Cross-Architecture:** Does it survive normalization layers (BatchNorm/LayerNorm)?
-3. **Loss-Baseline Partial Correlation:** Does it predict generalisation *beyond* what the validation loss already predicts?
-4. **Initialization Probe:** Does the signal exist when the loss is flat?
-
-If your metric fails step 3 or 4, it is a proxy, not a novel signal.
-
-## Running the Code
-The tracker relies on standard `numpy` and `torch` (for the PyTorch wrappers). All tests log to console and export data/images (e.g., `*.csv`, `*.png`) to the local directory.
+To run the sample test on a dummy metric:
 
 ```bash
-# Example: Run the decisive Test 11 falsification
-cd experiments/04_falsification
-python fim_early_predictor.py
+cd mbe_eval
+python sample_eval.py
 ```
+
+### What happens in `sample_eval.py`?
+1. It simulates 30 heterogeneous training runs with varying hyperparameters.
+2. It generates a "Proposed Metric" that is secretly just a noisy copy of the early validation loss.
+3. **Stage 1 (Absolute Correlation):** It checks if the metric predicts final generalization. It will **PASS**, yielding a massive $p$-value and appearing to be a breakthrough discovery.
+4. **Stage 2 (MBE Control):** It runs the partial-correlation control against the trivial baseline (early validation loss). It will instantly **FAIL**, revealing the metric offers zero marginal signal.
+
+## The Full 12-Test Falsification (Case Study)
+If you wish to explore the original case study that proved why MBE is necessary—the complete falsification of the Gradient Effective Rank metric ($\text{FIM}_{norm}$) across MLPs, CNNs, and Transformers—all scripts are preserved in the `experiments/` directory.
+
+See `PAPER.md` for the full technical writeup of the math, the origin story, and the mechanistic autopsy.
+
+## Citation
+If you use the Marginal Baseline Eval in your own representation evaluation, please cite the accompanying manuscript.
