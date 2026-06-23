@@ -18,6 +18,14 @@ The MBE protocol catches these false positive metrics using a rigorous **partial
 
 ## Installation
 
+You can install the framework directly from PyPI:
+
+```bash
+pip install mbe-eval
+```
+
+Or, if you want to run the PyTorch demos, clone the repository:
+
 ```bash
 git clone https://github.com/AparajeetS/metric-audit-paper-code.git
 cd metric-audit-paper-code
