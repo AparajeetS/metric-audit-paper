@@ -1,4 +1,4 @@
-﻿# mbe-eval v0.2.0
+# mbe-eval v0.2.0
 
 PyPI: https://pypi.org/project/mbe-eval/0.2.0/
 
