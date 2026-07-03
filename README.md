@@ -1,59 +1,122 @@
-﻿# Metric Audit Paper Code
+# Marginal Baseline Evaluation
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/mbe-eval.svg)](https://pypi.org/project/mbe-eval/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Code and Python package for experiments on **Marginal Baseline Evaluation (MBE)**: an audit protocol for testing whether a proposed generalization metric keeps predictive signal after ordinary training baselines and experimental design variables are controlled.
+**Marginal Baseline Evaluation (MBE)** is an audit protocol for testing whether
+machine-learning training metrics still predict held-out performance after
+controlling for ordinary baselines such as learning rate, weight decay,
+optimizer, architecture, task, seed, and validation loss.
 
-The current research direction is deliberately empirical. A metric can look useful under raw correlation, weaken after controls, invert sign, or survive in some architectures/tasks but not others. MBE is the framework for making those cases visible instead of treating one pooled correlation as the whole story.
+The project started from a concrete failure mode: a proposed metric can look
+promising under raw pooled correlation while actually tracking easier baselines,
+training loss, architecture mix, or other design variables. MBE makes that
+failure visible by comparing raw association against controlled partial
+rank-correlation.
 
-## What This Repository Contains
+## Current Status
 
-- `mbe_eval/`: lightweight package for raw and partial rank-correlation audits.
-- `examples/`: small demonstrations using FIM_norm and synthetic data.
-- `experiments/`: paper-scale and exploratory experiments, including CIFAR-10, transformers/language-model probes, and Kaggle-scale runs.
-- Public Kaggle walkthrough: [Audit ML Training Metrics with MBE](https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe).
-- `PAPER.md` and `JMLR_STRATEGY.md`: evolving paper notes and publication strategy.
+This is an active research direction with an accompanying Python package,
+Kaggle-scale experiment artifacts, and a public walkthrough notebook.
 
-## Installation
+- Package: [`mbe-eval`](https://pypi.org/project/mbe-eval/)
+- Public notebook: [Audit ML Training Metrics with MBE](https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe)
+- Evidence ledger: [SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md)
+- Reproducibility notes: [REPRODUCIBILITY.md](REPRODUCIBILITY.md)
+- Paper notes: [PAPER.md](PAPER.md) and [JMLR_STRATEGY.md](JMLR_STRATEGY.md)
 
-Install the core MBE audit library:
+The latest confirmed evidence set contains **680 trained models**:
+
+- 480 CIFAR-10 image models across CNN, ResNet, ViT, and WideResNet settings.
+- 200 character-transformer language models.
+- 40+ candidate metrics including gradient/Fisher metrics, feature metrics,
+  confidence/calibration metrics, sharpness metrics, weight norms, and
+  distance/update proxies.
+
+## What The Evidence Suggests
+
+The current Kaggle-scale runs support a selective audit story:
+
+- MBE does **not** destroy every metric.
+- Several validation, confidence/logit, gradient/Fisher magnitude, and
+  task-proximal metrics survive.
+- Several feature-rank, weight-norm, distance/update, and sharpness/noise-scale
+  metrics weaken, wash out, or invert under controls.
+- FIM_norm is the motivating case study: it looked promising under conventional
+  metric validation, then became task-dependent under MBE.
+
+FIM_norm summary from the current confirmed pool:
+
+| Audit | n | Raw rho | MBE partial rho | Class |
+|---|---:|---:|---:|---|
+| Image only, default controls | 480 | -0.662 | -0.218 | survives |
+| Image only, strict + validation loss | 480 | -0.662 | -0.383 | survives |
+| Text only, default controls | 200 | -0.291 | +0.014 | washout |
+| Text only, strict + validation loss | 200 | -0.291 | +0.188 | weak-or-mixed |
+| Full image+text pool, default controls | 680 | +0.225 | -0.203 | reverse-inversion |
+| Full image+text pool, strict + validation loss | 680 | +0.225 | -0.300 | reverse-inversion |
+
+Full result tables and interpretation are in
+[SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md).
+
+## Install
 
 ```bash
 pip install mbe-eval
 ```
 
-Current PyPI release: [`mbe-eval==0.2.0`](https://pypi.org/project/mbe-eval/0.2.0/).
-
-For local development from this repository:
-
-```bash
-git clone https://github.com/AparajeetS/metric-audit-paper-code.git
-cd metric-audit-paper-code
-pip install -e .
-```
-
-The core install only requires NumPy, pandas, and SciPy. FIM_norm extraction uses PyTorch and is optional:
+Optional FIM_norm extraction utilities require PyTorch:
 
 ```bash
 pip install "mbe-eval[torch]"
 ```
 
-## Basic Usage
+For local development:
 
-Audit several candidate metrics in one dataframe:
+```bash
+git clone https://github.com/AparajeetS/metric-audit-paper.git
+cd metric-audit-paper
+pip install -e ".[dev]"
+```
+
+## Try It In One Command
+
+After installation:
+
+```bash
+mbe-eval-demo --bootstrap 200
+```
+
+This runs a CPU-only synthetic audit, prints the MBE table, and writes
+`mbe_demo_report.md`. The demo is intentionally small; replace the synthetic
+dataframe with your training-run ledger for real experiments.
+Use `--no-output` if you only want the printed table.
+
+To audit your own CSV ledger:
+
+```bash
+mbe-eval-audit \
+  --csv runs.csv \
+  --metrics fim_norm,val_loss_ep20,grad_norm \
+  --target test_accuracy \
+  --controls learning_rate,weight_decay,optimizer,arch,seed \
+  --bootstrap 200 \
+  --output audit_report.md
+```
+
+## Basic API
 
 ```python
 import pandas as pd
-from mbe_eval import audit_metrics
+from mbe_eval import audit_metrics, audit_report_markdown
 
 df = pd.DataFrame(
     {
-        "fim_norm": [0.42, 0.51, 0.37, 0.65],
-        "val_loss_ep20": [1.2, 0.9, 1.4, 0.7],
-        "learning_rate": [1e-3, 1e-3, 3e-4, 3e-4],
-        "weight_decay": [1e-4, 1e-5, 1e-4, 1e-5],
-        "test_accuracy": [0.71, 0.78, 0.68, 0.82],
+        "fim_norm": [0.42, 0.51, 0.37, 0.65, 0.62, 0.35],
+        "val_loss_ep20": [1.2, 0.9, 1.4, 0.7, 0.8, 1.5],
+        "learning_rate": [1e-3, 1e-3, 3e-4, 3e-4, 1e-4, 1e-4],
+        "arch": ["cnn", "cnn", "resnet", "resnet", "vit", "vit"],
+        "test_accuracy": [0.71, 0.78, 0.68, 0.82, 0.80, 0.66],
     }
 )
 
@@ -61,82 +124,58 @@ report = audit_metrics(
     df,
     metrics=["fim_norm", "val_loss_ep20"],
     target="test_accuracy",
-    controls=["learning_rate", "weight_decay"],
+    controls=["learning_rate", "arch"],
+    bootstrap=100,
 )
 
 print(report[["metric", "raw_r", "partial_r", "classification"]])
+print(audit_report_markdown(report, target="test_accuracy", controls=["learning_rate", "arch"]))
 ```
 
-Use the backward-compatible single-metric API:
+Your dataframe should have one row per trained model/run, one held-out target,
+candidate metric columns, and baseline/design columns to control.
 
-```python
-from mbe_eval import MBEEvaluator
+## Reproduce Current Tables
 
-evaluator = MBEEvaluator(metric_name="FIM_norm", baseline_name="Validation Loss")
-report = evaluator.evaluate(metric_vals, baseline_vals, target_vals)
-print(report.partial_r, report.classification)
-```
-
-## Reproducing Current Experiments
-
-The current paper-scale audit lives in:
+The main paper-scale audit can be regenerated from saved result CSVs:
 
 ```bash
 python experiments/07_jmlr_scale/analyze_jmlr_scale.py
 ```
 
-Earlier falsification experiments are in:
+The public notebook source lives in:
 
 ```bash
-python experiments/04_falsification/fim_unified_grid.py
-python experiments/04_falsification/extract_tables.py
+kaggle/mbe_metric_audit/how_to_audit_ml_training_metrics_mbe.ipynb
 ```
 
-The Kaggle-scale scripts under `experiments/07_jmlr_scale/` train and audit image and text models. Their outputs are summarized in `jmlr_scale_v2_audit_summary.md` when downloaded.
+Kaggle training scripts and raw result manifests are under
+`experiments/07_jmlr_scale/`. See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) and
+[experiments/07_jmlr_scale/ARTIFACTS.md](experiments/07_jmlr_scale/ARTIFACTS.md)
+for commands and artifact hashes.
 
-## Current Result Snapshot
-
-The current confirmed evidence set contains 680 trained models: 480 CIFAR-10 image models and 200 character-transformer language models.
-
-FIM_norm is the motivating case study:
-
-| Audit | n | Raw rho | MBE partial rho | Class |
-|---|---:|---:|---:|---|
-| Image only, default controls | 480 | -0.662 | -0.218 | survives |
-| Text only, default controls | 200 | -0.291 | +0.014 | washout |
-| Full image+text pool | 680 | +0.225 | -0.203 | reverse-inversion |
-| Full pool, also controlling validation loss | 680 | +0.225 | -0.300 | reverse-inversion |
-
-The key point is selectivity: MBE weakens fragile pooled artifacts such as FIM_norm, feature rank, weight norms, and distance/update metrics, while several predictors survive, including validation loss, gradient/Fisher magnitude metrics, logit confidence metrics, and metric-batch accuracy.
-
-See [JMLR_RUN_PROGRESS_LOG_2026-06-28.md](JMLR_RUN_PROGRESS_LOG_2026-06-28.md) for the run ledger and [experiments/07_jmlr_scale/ARTIFACTS.md](experiments/07_jmlr_scale/ARTIFACTS.md) for result artifact hashes.
-
-For a public, runnable introduction to the method, see the Kaggle notebook:
-[Audit ML Training Metrics with MBE](https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe).
-
-## Repository Structure
+## Repository Layout
 
 ```text
-metric-audit-paper-code/
-+-- mbe_eval/
-|   +-- __init__.py
-|   +-- core.py
-|   +-- utils.py
-|   +-- sample_eval.py
-+-- examples/
-|   +-- 01_run_acid_test.py
-|   +-- 02_run_heterogeneous_grid.py
-+-- experiments/
-|   +-- 04_falsification/
-|   +-- 05_kaggle/
-|   +-- 06_independent_audit/
-|   +-- 07_jmlr_scale/
-+-- JMLR_RUN_PROGRESS_LOG_2026-06-28.md
-+-- tests/
-+-- pyproject.toml
-+-- setup.py
-+-- README.md
+metric-audit-paper/
++-- mbe_eval/                  # installable MBE package
++-- examples/                  # small local examples
++-- experiments/               # paper-scale and exploratory experiments
++-- kaggle/mbe_metric_audit/   # public Kaggle notebook source
++-- SUPPORTING_EVIDENCE.md     # run-by-run evidence ledger
++-- REPRODUCIBILITY.md         # reproduction commands and expected artifacts
++-- PAPER.md                   # evolving paper direction
++-- JMLR_STRATEGY.md           # publication strategy notes
 ```
+
+## Research Claim
+
+The claim is not that any one metric is universally bad. The claim is narrower
+and more useful:
+
+> Raw pooled correlation is insufficient for validating ML training metrics.
+> MBE audits whether a metric retains signal beyond ordinary training baselines
+> and experimental design variables.
 
 ## Citation
 
@@ -145,10 +184,10 @@ metric-audit-paper-code/
   title={Marginal Baseline Evaluation for Auditing Generalization Metrics},
   author={Shadangi, Aparajeet},
   year={2026},
-  note={Preprint}
+  note={Preprint and open-source research artifact}
 }
 ```
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](LICENSE).

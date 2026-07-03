@@ -6,8 +6,9 @@ This log records the state of the current JMLR-scale MBE run sequence.
 
 ## 1. Package and Code State
 
-- Published PyPI package: `mbe-eval==0.2.0`
-- PyPI release page: https://pypi.org/project/mbe-eval/0.2.0/
+- Package state at the time of the run: `mbe-eval==0.2.0`
+- Current polished package release target: `mbe-eval==0.3.0`
+- PyPI release page: https://pypi.org/project/mbe-eval/
 - Core package now supports:
   - raw rank-correlation audits
   - partial rank-correlation MBE controls

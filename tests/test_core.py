@@ -1,7 +1,17 @@
-﻿import numpy as np
+import numpy as np
 import pandas as pd
 
-from mbe_eval import MBEEvaluator, audit_metric, audit_metrics, partial_rank_corr
+from mbe_eval import (
+    MBEEvaluator,
+    audit_csv,
+    audit_metric,
+    audit_metrics,
+    audit_report_markdown,
+    make_demo_runs,
+    partial_rank_corr,
+    run_demo,
+    summarize_audit,
+)
 
 
 def synthetic_frame(seed=0, n=300):
@@ -86,3 +96,59 @@ def test_audit_metric_ignores_metric_when_it_is_also_a_control():
     assert row["metric"] == "baseline"
     assert np.isfinite(row["raw_r"])
     assert np.isfinite(row["partial_r"])
+
+
+def test_reporting_helpers_create_markdown():
+    df = synthetic_frame()
+    report = audit_metrics(
+        df,
+        metrics=["proxy_metric", "residual_metric"],
+        target="target",
+        controls=["baseline", "learning_rate", "architecture"],
+    )
+    summary = summarize_audit(report)
+    markdown = audit_report_markdown(report, target="target", controls=["baseline"])
+
+    assert list(summary.columns) == [
+        "metric",
+        "n",
+        "raw_r",
+        "partial_r",
+        "delta_partial_minus_raw",
+        "classification",
+    ]
+    assert "# MBE Audit Report" in markdown
+    assert "| `proxy_metric` |" in markdown
+
+
+def test_demo_runs_end_to_end_without_writing(tmp_path):
+    df = make_demo_runs(n=40, seed=1)
+    report = run_demo(n=40, seed=1, bootstrap=0, output=None)
+
+    assert len(df) == 40
+    assert set(report["metric"]) == {
+        "reported_gain",
+        "validation_gain",
+        "train_gain",
+        "parameter_delta",
+        "random_metric",
+    }
+    assert not (tmp_path / "mbe_demo_report.md").exists()
+
+
+def test_csv_cli_helper_audits_training_ledger(tmp_path):
+    csv_path = tmp_path / "runs.csv"
+    out_path = tmp_path / "report.md"
+    synthetic_frame(n=80).to_csv(csv_path, index=False)
+
+    report = audit_csv(
+        csv_path,
+        metrics=["proxy_metric", "residual_metric"],
+        target="target",
+        controls=["baseline", "learning_rate", "architecture"],
+        output=out_path,
+    )
+
+    assert set(report["metric"]) == {"proxy_metric", "residual_metric"}
+    assert out_path.exists()
+    assert "MBE CSV Audit Report" in out_path.read_text(encoding="utf-8")

@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite the repository and package."
+title: "Marginal Baseline Evaluation for Auditing Generalization Metrics"
+authors:
+  - family-names: "Shadangi"
+    given-names: "Aparajeet"
+year: 2026
+license: MIT
+repository-code: "https://github.com/AparajeetS/metric-audit-paper"
+url: "https://pypi.org/project/mbe-eval/"
+keywords:
+  - machine learning
+  - evaluation
+  - generalization
+  - metric auditing
+  - reproducibility
