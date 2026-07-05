@@ -47,6 +47,21 @@ Expected headline outputs include:
 The key raw result artifacts and SHA256 hashes are listed in
 `experiments/07_jmlr_scale/ARTIFACTS.md`.
 
+## CPU-Only Uncertainty And Threshold Sensitivity
+
+Bootstrap confidence intervals and threshold-sensitivity counts can be
+regenerated from saved CSVs without GPU compute:
+
+```bash
+python experiments/07_jmlr_scale/no_compute_uncertainty.py --bootstrap 200
+```
+
+Expected outputs:
+
+- `experiments/07_jmlr_scale/no_compute_outputs/headline_bootstrap_ci.csv`
+- `experiments/07_jmlr_scale/no_compute_outputs/threshold_sensitivity.csv`
+- `experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md`
+
 ## Public Notebook
 
 The public Kaggle walkthrough is:

@@ -249,3 +249,23 @@ enough to freeze a JMLR submission. Remaining needs:
   architecture/task, and strict + validation loss;
 - a cleaned metric taxonomy table;
 - a reproducibility page with commands and artifact hashes.
+
+## 10. No-Compute Addendum
+
+After the initial evidence ledger, a CPU-only uncertainty pass was added:
+
+- script: `experiments/07_jmlr_scale/no_compute_uncertainty.py`
+- report: `experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md`
+- bootstrap resamples: 200
+- bootstrap unit: row/model run
+
+Headline checks:
+
+- full 680 default FIM_norm: raw `+0.225 [+0.136, +0.314]`, MBE partial `-0.203 [-0.267, -0.117]`, reverse-inversion;
+- full 680 strict FIM_norm: raw `+0.225 [+0.138, +0.296]`, MBE partial `-0.300 [-0.389, -0.217]`, reverse-inversion;
+- full 680 default random metric: raw and partial CIs overlap zero, weak-or-mixed;
+- full 680 strict confidence_mean: raw and partial CIs stay positive, survives.
+
+This strengthens the current narrative without new training compute: the
+headline FIM_norm pooled reversal is not just a point-estimate artifact, while
+the negative control remains weak and a positive confidence metric survives.

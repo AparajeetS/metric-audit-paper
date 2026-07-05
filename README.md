@@ -23,6 +23,12 @@ Kaggle-scale experiment artifacts, and a public walkthrough notebook.
 - Public notebook: [Audit ML Training Metrics with MBE](https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe)
 - Evidence ledger: [SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md)
 - Reproducibility notes: [REPRODUCIBILITY.md](REPRODUCIBILITY.md)
+- Protocol freeze: [PROTOCOL_FREEZE.md](PROTOCOL_FREEZE.md)
+- Metric taxonomy: [METRIC_TAXONOMY.md](METRIC_TAXONOMY.md)
+- Figures: [FIGURES.md](FIGURES.md)
+- Project brief: [PROJECT_BRIEF.md](PROJECT_BRIEF.md)
+- Next experiment protocol: [NEXT_EXPERIMENT_PROTOCOL.md](NEXT_EXPERIMENT_PROTOCOL.md)
+- Paper skeleton: [PAPER_SKELETON.md](PAPER_SKELETON.md)
 - Paper notes: [PAPER.md](PAPER.md) and [JMLR_STRATEGY.md](JMLR_STRATEGY.md)
 
 The latest confirmed evidence set contains **680 trained models**:
@@ -58,6 +64,8 @@ FIM_norm summary from the current confirmed pool:
 
 Full result tables and interpretation are in
 [SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md).
+CPU-only bootstrap confidence intervals and threshold sensitivity are in
+[experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md](experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md).
 
 ## Install
 
