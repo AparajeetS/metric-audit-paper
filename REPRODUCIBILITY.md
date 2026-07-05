@@ -29,10 +29,29 @@ This writes `mbe_demo_report.md` and does not require GPU compute.
 
 ## Regenerate MBE Tables From Saved CSVs
 
-The current paper-scale summaries are generated from saved Kaggle CSV outputs:
+The current paper-scale summaries are generated from saved Kaggle CSV outputs.
+Use the explicit CSV paths below so the command reproduces the tracked headline
+tables rather than accidentally auditing an empty directory:
 
 ```bash
-python experiments/07_jmlr_scale/analyze_jmlr_scale.py
+python experiments/07_jmlr_scale/analyze_jmlr_scale.py \
+  experiments/07_jmlr_scale/kaggle_downloads/image_v2/jmlr_scale_image_results.csv \
+  experiments/07_jmlr_scale/kaggle_downloads/confirm_image/jmlr_confirm_image_results.csv \
+  experiments/07_jmlr_scale/kaggle_downloads/text_v2/jmlr_scale_text_results.csv \
+  experiments/07_jmlr_scale/kaggle_downloads/confirm_text/jmlr_confirm_text_results.csv \
+  --out-prefix experiments/07_jmlr_scale/jmlr_full_confirmed_680_audit
+```
+
+For the strict validation-loss control audit:
+
+```bash
+python experiments/07_jmlr_scale/analyze_jmlr_scale.py \
+  experiments/07_jmlr_scale/kaggle_downloads/image_v2/jmlr_scale_image_results.csv \
+  experiments/07_jmlr_scale/kaggle_downloads/confirm_image/jmlr_confirm_image_results.csv \
+  experiments/07_jmlr_scale/kaggle_downloads/text_v2/jmlr_scale_text_results.csv \
+  experiments/07_jmlr_scale/kaggle_downloads/confirm_text/jmlr_confirm_text_results.csv \
+  --covars lr,wd,dropout,optimizer,arch,task,seed,val_loss \
+  --out-prefix experiments/07_jmlr_scale/jmlr_full_confirmed_680_strict_loss_mbe
 ```
 
 Expected headline outputs include:

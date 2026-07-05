@@ -220,7 +220,7 @@ def write_markdown(boot: pd.DataFrame, sens: pd.DataFrame, out_path: Path, n_boo
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="CPU-only uncertainty analysis from saved JMLR-scale CSVs.")
+    parser = argparse.ArgumentParser(description="CPU-only uncertainty analysis from saved large-scale CSVs.")
     parser.add_argument("--bootstrap", type=int, default=200, help="Bootstrap resamples per metric/run.")
     parser.add_argument("--seed", type=int, default=20260705, help="Bootstrap seed.")
     parser.add_argument(

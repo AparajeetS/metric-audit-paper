@@ -68,7 +68,12 @@ python jmlr_scale_experiment.py
 Analysis:
 
 ```powershell
-python analyze_jmlr_scale.py . --out-prefix jmlr_scale_audit
+python analyze_jmlr_scale.py `
+  kaggle_downloads\image_v2\jmlr_scale_image_results.csv `
+  kaggle_downloads\confirm_image\jmlr_confirm_image_results.csv `
+  kaggle_downloads\text_v2\jmlr_scale_text_results.csv `
+  kaggle_downloads\confirm_text\jmlr_confirm_text_results.csv `
+  --out-prefix jmlr_full_confirmed_680_audit
 ```
 
 Residual metric discovery:

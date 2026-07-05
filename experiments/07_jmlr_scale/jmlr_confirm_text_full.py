@@ -693,7 +693,7 @@ def append_row(path: Path, row: dict[str, float | int | str]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="JMLR-scale MBE metric battery runner.")
+    parser = argparse.ArgumentParser(description="Large-scale MBE metric battery runner.")
     parser.add_argument("--suite", choices=["image", "text"], default=os.environ.get("CEI_SUITE", "text"))
     parser.add_argument("--architectures", default=os.environ.get("CEI_ARCHS", "cnn,resnet,wide_resnet,vit"))
     parser.add_argument("--models-per-arch", type=int, default=int(os.environ.get("CEI_MODELS_PER_ARCH", "120")))

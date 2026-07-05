@@ -167,7 +167,7 @@ def summarize_group(df: pd.DataFrame, group_name: str, covars: list[str], target
 
 def render_markdown(summary: pd.DataFrame, out_csv: Path, covars: list[str]) -> str:
     lines = [
-        "# JMLR-Scale Metric Audit",
+        "# Large-Scale Metric Audit",
         "",
         f"- summary csv: `{out_csv}`",
         f"- MBE covariates: `{', '.join(covars)}`",
@@ -196,7 +196,7 @@ def render_markdown(summary: pd.DataFrame, out_csv: Path, covars: list[str]) -> 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Analyze JMLR-scale MBE metric CSV shards.")
+    parser = argparse.ArgumentParser(description="Analyze large-scale MBE metric CSV shards.")
     parser.add_argument("inputs", nargs="+", type=Path)
     parser.add_argument("--target", default="final_acc")
     parser.add_argument(

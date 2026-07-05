@@ -68,9 +68,9 @@ This matters because it shows the audit is not merely destructive. It can distin
 
 Before a serious submission:
 
-- add bootstrap confidence intervals,
-- add permutation and random-metric sanity controls,
-- freeze classification thresholds,
+- extend bootstrap confidence intervals to all headline tables,
+- add permutation controls and block-level resampling,
+- keep classification thresholds frozen unless changes are versioned,
 - run one locked holdout replication,
-- add clean reproduction commands and artifact hashes,
+- keep reproduction commands and artifact hashes current,
 - decide whether to add one more independent image or text suite.

@@ -21,8 +21,8 @@ Use this page as the map for the research repository.
 ## Reproducibility
 
 - [Reproducibility guide](../REPRODUCIBILITY.md): local setup and artifact regeneration.
-- Large-scale artifacts: raw CSV hashes and regeneration commands.
-- No-compute uncertainty: bootstrap CIs and threshold sensitivity from saved CSVs.
+- [Large-scale artifacts](../experiments/07_jmlr_scale/ARTIFACTS.md): raw CSV hashes and regeneration commands.
+- [No-compute uncertainty](../experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md): bootstrap CIs and threshold sensitivity from saved CSVs.
 - [Run progress log](../RUN_PROGRESS_LOG_2026-06-28.md): ledger for the current 680-model evidence set.
 
 ## Package

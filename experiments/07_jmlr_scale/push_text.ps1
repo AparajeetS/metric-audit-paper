@@ -4,8 +4,8 @@ $kaggle = "C:\Users\apara\AppData\Local\Python\pythoncore-3.14-64\Scripts\kaggle
 
 @'
 {
-  "id": "aparajeetshadangi/cei-mbe-jmlr-scale-text",
-  "title": "CEI MBE JMLR Scale Text",
+  "id": "aparajeetshadangi/cei-mbe-large-scale-text",
+  "title": "CEI MBE Large Scale Text",
   "code_file": "jmlr_scale_text_kernel.py",
   "language": "python",
   "kernel_type": "script",

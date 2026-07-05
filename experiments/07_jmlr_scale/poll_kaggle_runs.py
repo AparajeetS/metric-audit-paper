@@ -8,10 +8,10 @@ from pathlib import Path
 
 
 KERNELS = {
-    "image": "aparajeetshadangi/cei-mbe-jmlr-scale-image",
-    "text": "aparajeetshadangi/cei-mbe-jmlr-scale-text",
-    "confirm_image": "aparajeetshadangi/cei-mbe-jmlr-confirm-image",
-    "confirm_text": "aparajeetshadangi/cei-mbe-jmlr-confirm-text",
+    "image": "aparajeetshadangi/cei-mbe-large-scale-image",
+    "text": "aparajeetshadangi/cei-mbe-large-scale-text",
+    "confirm_image": "aparajeetshadangi/cei-mbe-confirm-image",
+    "confirm_text": "aparajeetshadangi/cei-mbe-confirm-text",
 }
 
 KAGGLE_EXE = Path(r"C:\Users\apara\AppData\Local\Python\pythoncore-3.14-64\Scripts\kaggle.exe")
@@ -47,7 +47,7 @@ def download(name: str, kernel: str, root: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Poll Kaggle JMLR-scale kernels and download completed outputs.")
+    parser = argparse.ArgumentParser(description="Poll Kaggle large-scale kernels and download completed outputs.")
     parser.add_argument("--download-root", type=Path, default=Path("kaggle_downloads"))
     parser.add_argument("--interval", type=int, default=300)
     parser.add_argument("--once", action="store_true")
