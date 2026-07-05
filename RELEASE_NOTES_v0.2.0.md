@@ -2,7 +2,7 @@
 
 PyPI: https://pypi.org/project/mbe-eval/0.2.0/
 
-This release updates the project from a single FIM_norm demonstration into a reusable Marginal Baseline Evaluation (MBE) audit package and ships the current JMLR-scale experiment evidence.
+This release updates the project from a single FIM_norm demonstration into a reusable Marginal Baseline Evaluation (MBE) audit package and ships the current large-scale experiment evidence.
 
 ## Highlights
 
@@ -16,7 +16,7 @@ This release updates the project from a single FIM_norm demonstration into a reu
 - Removed mandatory PyTorch, plotting, and rich-console dependencies from the core package.
 - Made `compute_fim_norm` an optional PyTorch utility via `mbe-eval[torch]`.
 - Added unit tests for core MBE behavior and backward compatibility.
-- Added JMLR-scale image/text experiment scripts, analysis outputs, and progress logs.
+- Added large-scale image/text experiment scripts, analysis outputs, and progress logs.
 
 ## Current Evidence Snapshot
 

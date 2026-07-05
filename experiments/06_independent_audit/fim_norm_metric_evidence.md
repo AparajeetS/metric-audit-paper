@@ -1,4 +1,4 @@
-﻿# JMLR-Style Evidence Check for FIM_norm
+# Publication-Style Evidence Check for FIM_norm
 
 ## Question
 
@@ -8,9 +8,9 @@ Short answer:
 
 Yes. Under ordinary metric evaluation, `FIM_norm` looks strong enough to motivate a serious paper. That is what makes the MBE failure useful.
 
-## JMLR Metric/Measure Paper Pattern
+## Metric/Measure Paper Pattern
 
-Recent JMLR examples show that the journal does accept papers centered on metrics, measures, or evaluation metrics:
+Recent venue examples show that metric-centered papers can be accepted as papers centered on metrics, measures, or evaluation metrics:
 
 - "Towards Explainable Evaluation Metrics for Machine Translation" is explicitly about evaluation metrics and argues that strong correlations with human judgments are not enough when metric decisions are opaque.
 - "Linear Distance Metric Learning with Noisy Labels" centers on learning a Mahalanobis metric. Its abstract and introduction emphasize theory plus synthetic and real-data experiments.
@@ -156,7 +156,7 @@ This is the core story:
 
 ## Verdict
 
-Under ordinary JMLR-style metric evidence, `FIM_norm` passes a surprising amount:
+Under ordinary publication-style metric evidence, `FIM_norm` passes a surprising amount:
 
 - clear definition
 - controlled monotonic probes
@@ -177,7 +177,7 @@ This gives us stronger ammunition than an external critique, because we built th
 
 ## Next FIM_norm Experiments Worth Running
 
-For a JMLR-strength version, run:
+For a publication-strength version, run:
 
 1. Three independent replications of the MLP dual-acid test with fixed scripts and saved seeds.
 2. A large heterogeneous MLP grid with explicit reports for raw, loss-controlled, and hyperparameter-controlled correlations.

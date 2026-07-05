@@ -1,4 +1,4 @@
-﻿# JMLR-Scale Artifacts
+# Large-Scale Artifacts
 
 This folder contains scripts, summary reports, and compact CSV outputs for the current MBE audit.
 

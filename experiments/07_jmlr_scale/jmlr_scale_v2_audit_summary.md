@@ -1,4 +1,4 @@
-﻿# JMLR-Scale Metric Audit
+# Large-Scale Metric Audit
 
 - summary csv: `jmlr_scale_v2_audit_summary.csv`
 - MBE covariates: `lr, wd, dropout, optimizer, arch, task, seed`

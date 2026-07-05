@@ -30,7 +30,7 @@ Kaggle-scale experiment artifacts, and a public walkthrough notebook.
 - Project brief: [PROJECT_BRIEF.md](PROJECT_BRIEF.md)
 - Next experiment protocol: [NEXT_EXPERIMENT_PROTOCOL.md](NEXT_EXPERIMENT_PROTOCOL.md)
 - Paper skeleton: [PAPER_SKELETON.md](PAPER_SKELETON.md)
-- Paper notes: [PAPER.md](PAPER.md) and [JMLR_STRATEGY.md](JMLR_STRATEGY.md)
+- Paper notes: [PAPER.md](PAPER.md) and [PUBLICATION_STRATEGY.md](PUBLICATION_STRATEGY.md)
 - Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Roadmap: [ROADMAP.md](ROADMAP.md)
 
@@ -67,8 +67,8 @@ FIM_norm summary from the current confirmed pool:
 
 Full result tables and interpretation are in
 [SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md).
-CPU-only bootstrap confidence intervals and threshold sensitivity are in
-[experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md](experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md).
+CPU-only bootstrap confidence intervals and threshold sensitivity are summarized
+in the no-compute uncertainty report listed from the reproducibility guide.
 
 ## Install
 
@@ -148,11 +148,8 @@ candidate metric columns, and baseline/design columns to control.
 
 ## Reproduce Current Tables
 
-The main paper-scale audit can be regenerated from saved result CSVs:
-
-```bash
-python experiments/07_jmlr_scale/analyze_jmlr_scale.py
-```
+The main paper-scale audit can be regenerated from saved result CSVs. See
+[REPRODUCIBILITY.md](REPRODUCIBILITY.md) for the exact legacy artifact command.
 
 The public notebook source lives in:
 
@@ -160,10 +157,8 @@ The public notebook source lives in:
 kaggle/mbe_metric_audit/how_to_audit_ml_training_metrics_mbe.ipynb
 ```
 
-Kaggle training scripts and raw result manifests are under
-`experiments/07_jmlr_scale/`. See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) and
-[experiments/07_jmlr_scale/ARTIFACTS.md](experiments/07_jmlr_scale/ARTIFACTS.md)
-for commands and artifact hashes.
+Kaggle training scripts and raw result manifests are documented in
+[REPRODUCIBILITY.md](REPRODUCIBILITY.md) and the large-scale artifact manifest.
 
 ## Repository Layout
 
@@ -178,7 +173,7 @@ metric-audit-paper/
 +-- SUPPORTING_EVIDENCE.md     # run-by-run evidence ledger
 +-- REPRODUCIBILITY.md         # reproduction commands and expected artifacts
 +-- PAPER.md                   # evolving paper direction
-+-- JMLR_STRATEGY.md           # publication strategy notes
++-- PUBLICATION_STRATEGY.md    # publication strategy notes
 ```
 
 ## Research Claim

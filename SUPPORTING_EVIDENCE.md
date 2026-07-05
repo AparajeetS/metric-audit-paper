@@ -24,7 +24,7 @@ task-proximal metrics intact.
 Source notes:
 
 - `experiments/06_independent_audit/fim_norm_normal_eval.md`
-- `experiments/06_independent_audit/jmlr_fim_norm_tests.md`
+- `experiments/06_independent_audit/fim_norm_metric_evidence.md`
 
 These are conventional metric-evaluation checks, not MBE checks.
 
@@ -99,21 +99,21 @@ Interpretation:
 These runs validate code paths and show why larger image-scale runs were
 needed. They should not be used as central claims.
 
-## 5. Kaggle-Scale JMLR Runs
+## 5. Kaggle-Scale Runs
 
 Sources:
 
-- `experiments/07_jmlr_scale/jmlr_scale_v2_audit_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_confirm_image_audit_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_confirm_text_audit_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_image_combined_480_audit_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_image_combined_480_strict_loss_mbe_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_text_combined_200_audit_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_text_combined_200_strict_loss_mbe_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_full_confirmed_680_audit_summary.csv`
-- `experiments/07_jmlr_scale/jmlr_full_confirmed_680_strict_loss_mbe_summary.csv`
+- mixed image+text early-pool audit summary
+- image confirmation audit summary
+- text confirmation audit summary
+- image combined audit summary
+- image combined strict loss-control summary
+- text combined audit summary
+- text combined strict loss-control summary
+- full confirmed 680-model audit summary
+- full confirmed 680-model strict loss-control summary
 
-The default JMLR-scale MBE controls are:
+The default large-scale MBE controls are:
 
 ```text
 lr, wd, dropout, optimizer, arch, task, seed
@@ -129,7 +129,7 @@ val_loss
 
 | Run | n | FIM_norm result | Class mix in pooled audit | Washout metrics |
 |---|---:|---|---|---|
-| JMLR v2 mixed image+text early pool | 240 | `+0.309 -> -0.200`, weak-or-mixed | 15 survives, 14 weak/mixed, 9 washout, 3 hidden-after-control | grad_noise_scale, per_sample_grad_norm_std, sam_sharpness, hessian_trace_hutchinson, weight_l1, weight_rms, distance_from_init_l2, update_to_weight_ratio, feature_erank |
+| Large-scale v2 mixed image+text early pool | 240 | `+0.309 -> -0.200`, weak-or-mixed | 15 survives, 14 weak/mixed, 9 washout, 3 hidden-after-control | grad_noise_scale, per_sample_grad_norm_std, sam_sharpness, hessian_trace_hutchinson, weight_l1, weight_rms, distance_from_init_l2, update_to_weight_ratio, feature_erank |
 | Image confirmation only | 320 | `-0.651 -> -0.199`, weak-or-mixed | 18 survives, 18 weak/mixed, 2 washout, 1 hidden-after-control | relative_distance_from_init, update_to_weight_ratio |
 | Text confirmation only | 120 | `-0.270 -> -0.015`, washout | 14 survives, 13 weak/mixed, 10 washout, 1 hidden-after-control, 1 reverse-inversion | FIM_norm, fim_erank, fisher_entropy, weight_l2, weight_rms, margin_mean, brier, ece, logit_norm_mean, metric_batch_loss |
 | Image combined default | 480 | `-0.662 -> -0.218`, survives | 21 survives, 16 weak/mixed, 3 washout, 1 hidden-after-control | hessian_trace_hutchinson, relative_distance_from_init, update_to_weight_ratio |
@@ -240,7 +240,7 @@ The strongest current claim is:
 ## 9. Evidence Gaps Before Submission
 
 The current evidence is strong enough to guide the paper direction, but not yet
-enough to freeze a JMLR submission. Remaining needs:
+enough to freeze a submission. Remaining needs:
 
 - bootstrap confidence intervals for all headline correlations;
 - a locked holdout replication with no post-hoc narrative tuning;
@@ -254,8 +254,8 @@ enough to freeze a JMLR submission. Remaining needs:
 
 After the initial evidence ledger, a CPU-only uncertainty pass was added:
 
-- script: `experiments/07_jmlr_scale/no_compute_uncertainty.py`
-- report: `experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md`
+- script: no-compute uncertainty analysis
+- report: no-compute uncertainty summary
 - bootstrap resamples: 200
 - bootstrap unit: row/model run
 

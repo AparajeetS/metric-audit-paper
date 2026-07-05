@@ -85,7 +85,7 @@ python -m kaggle kernels push -p kaggle\mbe_metric_audit
 The package and saved-analysis scripts do not require GPU. Fresh model-training
 replications do.
 
-Current JMLR-scale training scripts live in:
+Current large-scale training scripts live in:
 
 ```text
 experiments/07_jmlr_scale/
@@ -116,7 +116,7 @@ The current confirmed pool used:
 Use these files when checking the research claims:
 
 - `SUPPORTING_EVIDENCE.md`: run-by-run interpretation and washout lists.
-- `JMLR_RUN_PROGRESS_LOG_2026-06-28.md`: run ledger for the current large-scale pass.
+- `RUN_PROGRESS_LOG_2026-06-28.md`: run ledger for the current large-scale pass.
 - `experiments/07_jmlr_scale/ARTIFACTS.md`: artifact hashes and raw CSV references.
 - `experiments/06_independent_audit/artifact_audit_report.md`: independent audit of older artifacts.
 

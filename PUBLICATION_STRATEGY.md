@@ -1,4 +1,4 @@
-﻿# JMLR Strategy: MBE as the Main Contribution
+# Publication Strategy: MBE as the Main Contribution
 
 ## Recommended Narrative
 
@@ -33,7 +33,7 @@ This narrative survives the current artifact state:
 
 ## Current Evidence Map
 
-### 680-Model JMLR-Scale Evidence
+### 680-Model Large-Scale Evidence
 
 The current backbone is the confirmed 680-model audit:
 
@@ -58,13 +58,13 @@ The earlier MLP and CNN grids are now supporting context, not the central claim.
 
 - MLP grids show confounding and inversion for SAM-like metrics.
 - Earlier CNN/BatchNorm runs showed checkpoint and sample-size sensitivity.
-- These experiments motivated the broader JMLR-scale audit.
+- These experiments motivated the broader large-scale audit.
 
 Safe interpretation:
 
 > Earlier inconsistencies are not a liability if framed correctly: they are why MBE needs to be a protocol with controls, grouping, and replication rather than a single raw-correlation table.
 
-## JMLR-Level Experiment Plan
+## Publication-Scale Experiment Plan
 
 ### Experiment A: Frozen Holdout Replication
 
@@ -86,7 +86,7 @@ Expected analysis:
 - replication-level variance
 - class stability across suites and architectures
 
-What JMLR gets:
+What reviewers get:
 
 - the core finding is not a one-shot artifact
 - the paper becomes a reproducible audit protocol, not a tuned result
@@ -106,7 +106,7 @@ Expected analysis:
 - compare metric classes to the current 680-model evidence
 - identify which conclusions are stable across tasks
 
-What JMLR gets:
+What reviewers get:
 
 - evidence that MBE is a method, not a one-dataset artifact
 
@@ -131,7 +131,7 @@ Expected analysis:
 - validation baselines should remain predictive
 - geometric metrics should be compared against both
 
-What JMLR gets:
+What reviewers get:
 
 - the audit is calibrated
 - reviewers cannot say the protocol just destroys every signal mechanically
@@ -147,7 +147,7 @@ Required additions:
 - permutation tests
 - suite-level and architecture-level resampling
 
-What JMLR gets:
+What reviewers get:
 
 - uncertainty-aware metric classes
 - less dependence on arbitrary thresholds
@@ -179,7 +179,7 @@ This title lets the data go where it wants. It does not force every experiment t
 
 Take the MBE-methodology path.
 
-The durable JMLR paper is a protocol paper with multiple failure modes:
+The durable paper is a protocol paper with multiple failure modes:
 
 - inversion
 - washout

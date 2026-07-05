@@ -162,7 +162,7 @@ Not allowed:
 - FIM_norm is universally useless.
 - MBE proves causal effects.
 - All geometric metrics fail.
-- The current evidence is a final JMLR-ready replication.
+- The current evidence is a final submission-ready replication.
 
 ## Next Locked Replication
 

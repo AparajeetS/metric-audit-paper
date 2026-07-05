@@ -1,4 +1,4 @@
-﻿# Paper Direction
+# Paper Direction
 
 Working title:
 
@@ -66,7 +66,7 @@ This matters because it shows the audit is not merely destructive. It can distin
 
 ## Next Required Evidence
 
-Before a serious JMLR submission:
+Before a serious submission:
 
 - add bootstrap confidence intervals,
 - add permutation and random-metric sanity controls,

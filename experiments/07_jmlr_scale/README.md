@@ -1,4 +1,4 @@
-﻿# JMLR-Scale Metric Audit
+# Large-Scale Metric Audit
 
 This folder contains the scaled evidence harness for auditing `FIM_norm` and a broad metric battery under Marginal Baseline Evaluation (MBE).
 
@@ -15,11 +15,18 @@ This folder contains the scaled evidence harness for auditing `FIM_norm` and a b
   - Computes MBE partial-rank correlations controlling `lr`, `wd`, `dropout`, `optimizer`, `arch`, `task`, and `seed`.
   - Labels results as `survives`, `washout`, `sign-inversion`, `reverse-inversion`, `hidden-after-control`, or `weak-or-mixed`.
 
+- `residual_metric_factory.py`
+  - Takes completed audit CSVs and constructs new baseline-orthogonal metric candidates.
+  - Uses cross-fitted rank residuals, so each row's residual is predicted from models that did not train on that row.
+  - Adds `resid_*` single-source candidates and `orth_*` composites for feature dispersion, gradient shape, curvature shape, update geometry, and structural instability.
+  - These are discovery metrics. Freeze any survivor before testing it on a confirmatory held-out run.
+
 ## Metric Battery
 
 The runner computes more than 20 metrics from the same metric batch:
 
 - FIM/Fisher: `fim_norm`, `fim_erank`, `fisher_trace`, `fisher_spectral`, `fisher_stable_rank`, `fisher_entropy`, `fisher_condition`
+- Shape-vs-magnitude diagnostics: `fim_unit_norm`, `fim_loss_scaled_norm`, `gradient_energy_entropy`, `gradient_energy_gini`, `grad_loss_logcorr`
 - Gradient/noise: `grad_norm`, `grad_l1`, `grad_linf`, `grad_mean_abs`, `grad_noise_scale`, per-sample gradient norm mean/std
 - Sharpness: `sam_sharpness`, `asam_sharpness`
 - Hessian approximations: `hessian_trace_hutchinson`, `hessian_top_eig_power`
@@ -64,6 +71,13 @@ Analysis:
 python analyze_jmlr_scale.py . --out-prefix jmlr_scale_audit
 ```
 
+Residual metric discovery:
+
+```powershell
+python residual_metric_factory.py jmlr_scale_image_results.csv jmlr_scale_text_results.csv --out jmlr_scale_augmented_metrics.csv
+python analyze_jmlr_scale.py jmlr_scale_augmented_metrics.csv --out-prefix jmlr_scale_augmented_audit
+```
+
 ## Interpretation
 
 This is not designed to prove that any metric is universally bad. The intended evidence is a matrix of failure modes:
@@ -73,4 +87,13 @@ This is not designed to prove that any metric is universally bad. The intended e
 - metrics that invert after controlling training determinants,
 - metrics that only look useful because the hyperparameter grid induced a marginal association.
 
-That is the JMLR-grade story: MBE as a stress test for metric claims, with `FIM_norm` included as our own good-faith metric that may pass ordinary checks and then fail under a stricter audit.
+That is the publication-grade story: MBE as a stress test for metric claims, with `FIM_norm` included as our own good-faith metric that may pass ordinary checks and then fail under a stricter audit.
+
+## Metric Construction Loop
+
+The audit can also be used constructively. Once a metric fails, the failure mode becomes a design constraint for the next candidate:
+
+- If a Fisher/gradient metric collapses into loss or gradient magnitude, residualize it against loss and magnitude controls before testing its remaining shape signal.
+- If feature-rank metrics are architecture-dependent, residualize them against architecture, task, optimizer, and current performance.
+- If sharpness is hyperparameter-confounded, test only the curvature residual left after loss, gradient magnitude, parameter scale, and hyperparameters are removed.
+- If a composite is discovered on this benchmark, treat it as exploratory until a held-out confirmatory shard verifies it.

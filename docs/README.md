@@ -16,14 +16,14 @@ Use this page as the map for the research repository.
 - [Next experiment protocol](../NEXT_EXPERIMENT_PROTOCOL.md): locked replication plan for future GPU runs.
 - [Paper skeleton](../PAPER_SKELETON.md): section-by-section manuscript scaffold.
 - [Paper direction](../PAPER.md): current paper thesis and claims to avoid.
-- [JMLR strategy](../JMLR_STRATEGY.md): publication strategy notes.
+- [publication strategy](../PUBLICATION_STRATEGY.md): publication strategy notes.
 
 ## Reproducibility
 
 - [Reproducibility guide](../REPRODUCIBILITY.md): local setup and artifact regeneration.
-- [JMLR artifacts](../experiments/07_jmlr_scale/ARTIFACTS.md): raw CSV hashes and regeneration commands.
-- [No-compute uncertainty](../experiments/07_jmlr_scale/no_compute_outputs/NO_COMPUTE_UNCERTAINTY.md): bootstrap CIs and threshold sensitivity from saved CSVs.
-- [Run progress log](../JMLR_RUN_PROGRESS_LOG_2026-06-28.md): ledger for the current 680-model evidence set.
+- Large-scale artifacts: raw CSV hashes and regeneration commands.
+- No-compute uncertainty: bootstrap CIs and threshold sensitivity from saved CSVs.
+- [Run progress log](../RUN_PROGRESS_LOG_2026-06-28.md): ledger for the current 680-model evidence set.
 
 ## Package
 

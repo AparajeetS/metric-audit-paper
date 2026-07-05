@@ -1,8 +1,8 @@
-﻿# MBE / Metric Audit Progress Log
+# MBE / Metric Audit Progress Log
 
 Date: 2026-06-28
 
-This log records the state of the current JMLR-scale MBE run sequence.
+This log records the state of the current large-scale MBE run sequence.
 
 ## 1. Package and Code State
 
@@ -120,7 +120,7 @@ Prefer claiming:
 - MBE exposes washout, sign inversion, hidden-after-control, and task/architecture dependence.
 - MBE is selective: several validation, gradient/Fisher magnitude, confidence/logit, and task-proximal metrics survive.
 
-## 9. Remaining Work Before JMLR Submission
+## 9. Remaining Work Before Submission
 
 Must-have:
 
@@ -175,4 +175,4 @@ Nice-to-have:
 
 Use the 680-model audit as the first complete evidence set. The next milestone should be:
 
-> Draft the paper around the 680-model result, then run one locked holdout replication and bootstrap all reported correlations. If the holdout preserves the FIM_norm task-dependence/reversal story while random controls stay weak and several metrics survive, the work becomes credible enough to target JMLR or TMLR.
+> Draft the paper around the 680-model result, then run one locked holdout replication and bootstrap all reported correlations. If the holdout preserves the FIM_norm task-dependence/reversal story while random controls stay weak and several metrics survive, the work becomes credible enough to target a suitable venue.

@@ -1,4 +1,4 @@
-﻿# JMLR-Scale Metric Audit
+# Large-Scale Metric Audit
 
 - summary csv: `experiments\07_jmlr_scale\jmlr_image_combined_480_strict_loss_mbe_summary.csv`
 - MBE covariates: `lr, wd, dropout, optimizer, arch, task, seed, val_loss`
