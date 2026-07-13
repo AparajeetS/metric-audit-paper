@@ -8,6 +8,7 @@ import pandas as pd
 
 from .core import audit_metrics
 from .reporting import summarize_audit, write_markdown_report
+from . import __version__
 
 
 DEMO_METRICS = [
@@ -129,6 +130,7 @@ def run_demo(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run a CPU-only MBE demo audit.")
+    parser.add_argument("--version", action="version", version=f"mbe-eval {__version__}")
     parser.add_argument("--n", type=int, default=160, help="Number of synthetic runs.")
     parser.add_argument("--seed", type=int, default=9, help="Random seed.")
     parser.add_argument("--bootstrap", type=int, default=200, help="Bootstrap resamples.")

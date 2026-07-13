@@ -4,19 +4,27 @@ Use this page as the map for the research repository.
 
 ## Start Here
 
+- [MBE 2.0 research program](MBE_2_RESEARCH_PROGRAM.md): current technical source of truth.
+- [JMLR milestone roadmap](JMLR_MILESTONE_ROADMAP.md): gated path from protocol freeze to submission.
+- [Compute and cost plan](COMPUTE_AND_COST_PLAN.md): minimum and recommended resource budgets.
+- [Open research inventory](../OPEN_RESEARCH.md): public infrastructure and maturity map.
 - [Project brief](../PROJECT_BRIEF.md): short grant-facing summary.
 - [README](../README.md): install, package usage, and current result snapshot.
 - [Figures](../FIGURES.md): visual summary of current evidence.
 - [Supporting evidence](../SUPPORTING_EVIDENCE.md): run-by-run result ledger.
 
-## Research Protocol
+## Legacy MBE 1.0 Material
 
-- [Protocol freeze](../PROTOCOL_FREEZE.md): frozen MBE definitions, controls, and classifications.
+- [Protocol freeze](../PROTOCOL_FREEZE.md): historical protocol for the existing pilot artifacts.
 - [Metric taxonomy](../METRIC_TAXONOMY.md): metric families and interpretation.
-- [Next experiment protocol](../NEXT_EXPERIMENT_PROTOCOL.md): locked replication plan for future GPU runs.
-- [Paper skeleton](../PAPER_SKELETON.md): section-by-section manuscript scaffold.
-- [Paper direction](../PAPER.md): current paper thesis and claims to avoid.
-- [publication strategy](../PUBLICATION_STRATEGY.md): publication strategy notes.
+- [Next experiment protocol](../NEXT_EXPERIMENT_PROTOCOL.md): superseded v1 replication plan; do not launch new compute from it.
+- [Paper skeleton](../PAPER_SKELETON.md): historical manuscript scaffold.
+- [Paper direction](../PAPER.md): historical v1 thesis and claims.
+- [Publication strategy](../PUBLICATION_STRATEGY.md): historical strategy notes.
+
+These files remain available for provenance. They are not the approved design
+for future experiments unless a decision is explicitly carried into the MBE 2.0
+research program.
 
 ## Reproducibility
 
@@ -31,6 +39,8 @@ Use this page as the map for the research repository.
 - [Package source](../mbe_eval/)
 - [Tests](../tests/)
 - [Examples](../examples/)
+- [Governance](../GOVERNANCE.md)
+- [Security policy](../SECURITY.md)
 
 ## Public Notebook
 

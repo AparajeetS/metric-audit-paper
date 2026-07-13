@@ -1,32 +1,16 @@
 # Roadmap
 
-## Current State
+The active roadmap is [MBE 2.0: JMLR Milestone Roadmap](docs/JMLR_MILESTONE_ROADMAP.md).
+The technical protocol is [MBE 2.0 Research Program](docs/MBE_2_RESEARCH_PROGRAM.md),
+and its resource model is [Compute and Cost Plan](docs/COMPUTE_AND_COST_PLAN.md).
 
-- `mbe-eval==0.3.0` is published on PyPI.
-- The repository includes a 680-model evidence set across image and text runs.
-- CPU-only bootstrap CIs and threshold-sensitivity tables are generated from saved CSVs.
-- Public Kaggle notebook and figures are available.
+## Immediate Gates
 
-## No-Compute Priorities
+1. Quarantine the MBE 1.0 pilot as exploratory evidence.
+2. Freeze targets, baseline ladders, metric cards, controls, and decision rules.
+3. Implement grouped cross-fitting, nonlinear nuisance models, uncertainty, and synthetic controls.
+4. Reanalyze suitable public model corpora before purchasing large GPU sweeps.
+5. Run a small image/text pilot and proceed only if recovery and falsification checks pass.
 
-- Polish manuscript sections from `PAPER_SKELETON.md`.
-- Turn current figures into publication-ready versions.
-- Expand related work notes.
-- Keep protocol and taxonomy frozen unless changes are explicitly versioned.
-
-## Compute-Required Priorities
-
-- Run the locked holdout protocol in `NEXT_EXPERIMENT_PROTOCOL.md`.
-- Add block-level bootstrap over seed/config groups.
-- Add control-set ablations:
-  - no controls;
-  - hyperparameters only;
-  - hyperparameters + architecture/task;
-  - strict + validation loss.
-- Add one additional task or dataset if compute allows.
-
-## Release Priorities
-
-- Keep `mbe-eval` focused on reusable MBE audits rather than paper-specific scripts.
-- Add more examples for real CSV ledgers.
-- Add plotting helpers only after the core API stabilizes.
+The old `PROTOCOL_FREEZE.md` and `NEXT_EXPERIMENT_PROTOCOL.md` are retained for
+provenance. They must not be used to launch future compute.

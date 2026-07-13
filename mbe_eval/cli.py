@@ -7,6 +7,7 @@ import pandas as pd
 
 from .core import audit_metrics
 from .reporting import summarize_audit, write_markdown_report
+from . import __version__
 
 
 def _split_csv_arg(value: str) -> list[str]:
@@ -48,6 +49,7 @@ def audit_csv(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Audit training metrics from a CSV ledger.")
+    parser.add_argument("--version", action="version", version=f"mbe-eval {__version__}")
     parser.add_argument("--csv", required=True, help="CSV with one row per trained run/model.")
     parser.add_argument("--metrics", required=True, help="Comma-separated candidate metric columns.")
     parser.add_argument("--target", required=True, help="Held-out target column.")

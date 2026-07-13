@@ -1,5 +1,12 @@
 # Supporting Evidence
 
+> **Evidence status:** This is an exploratory MBE v1 ledger preserved for
+> provenance. It is not submission-grade confirmatory evidence. The 680-row
+> pool contains repeated configurations, and its legacy text models lack a
+> causal attention mask and permit label leakage. Text and mixed-pool results
+> are retained to document the failure, not to support language-model claims.
+> New evidence must follow the [MBE 2.0 research program](docs/MBE_2_RESEARCH_PROGRAM.md).
+
 This file records the evidence accumulated so far for Marginal Baseline
 Evaluation (MBE) and the FIM_norm case study.
 
@@ -14,7 +21,7 @@ Definitions used below:
   controls. This can indicate masking by baseline/design variables.
 - `survives`: the metric retained meaningful association after MBE controls.
 
-The current evidence suggests a selective audit story: MBE does not kill all
+Within these exploratory runs, MBE does not kill all
 metrics. It weakens, washes out, or inverts some fragile proxies while leaving
 several validation, confidence/logit, gradient/Fisher magnitude, and
 task-proximal metrics intact.
@@ -112,6 +119,8 @@ Sources:
 - text combined strict loss-control summary
 - full confirmed 680-model audit summary
 - full confirmed 680-model strict loss-control summary
+- locked text holdout audit summary
+- locked image time-boxed holdout audit summary
 
 The default large-scale MBE controls are:
 
@@ -140,6 +149,8 @@ val_loss
 | Current + confirm text strict + val_loss | 360 | `+0.463 -> -0.040`, washout | 18 survives, 15 weak/mixed, 6 washout, 1 hidden-after-control | FIM_norm, fisher_stable_rank, grad_noise_scale, weight_l1, weight_linf, feature_norm_mean |
 | Full confirmed default | 680 | `+0.225 -> -0.203`, reverse-inversion | 19 survives, 12 weak/mixed, 7 washout, 2 hidden-after-control, 1 reverse-inversion | hessian_trace_hutchinson, weight_l2, weight_l1, distance_from_init_l2, update_to_weight_ratio, feature_erank, feature_norm_mean |
 | Full confirmed strict + val_loss | 680 | `+0.225 -> -0.300`, reverse-inversion | 26 survives, 6 weak/mixed, 4 washout, 3 hidden-after-control, 1 reverse-inversion | grad_noise_scale, asam_sharpness, feature_norm_mean, feature_cosine_mean |
+| Locked text holdout default | 100 | `-0.534 -> -0.224`, survives | 20 survives, 13 washout, 10 weak/mixed, 2 hidden-after-control, 1 reverse-inversion | fim_unit_erank, fim_unit_norm, grad_loss_logcorr, per_sample_grad_norm_std, weight_l2, weight_rms, distance_from_init_l2, relative_distance_from_init, update_to_weight_ratio, brier, metric_batch_acc, metric_batch_loss, train_acc |
+| Locked image time-boxed holdout default | 80 | `-0.699 -> -0.229`, survives | 27 survives, 16 weak/mixed, 2 washout, 2 sign-inversion, 1 hidden-after-control | distance_from_init_l2, relative_distance_from_init |
 
 ### FIM_norm Across the Main Confirmed Pool
 
@@ -151,14 +162,17 @@ val_loss
 | Text only, strict + val_loss | 200 | -0.291 | +0.188 | weak-or-mixed |
 | Full 680, default controls | 680 | +0.225 | -0.203 | reverse-inversion |
 | Full 680, strict + val_loss | 680 | +0.225 | -0.300 | reverse-inversion |
+| Locked text holdout, default controls | 100 | -0.534 | -0.224 | survives |
+| Locked image time-boxed holdout, default controls | 80 | -0.699 | -0.229 | survives |
 
 Interpretation:
 
 FIM_norm is not simply bad everywhere. It survives in image-only pooled audits,
-washes out in text-only default audits, and reverses in the full image+text
-pool. That is a stronger story than "FIM_norm fails": the result is
-task-dependent and pooling-sensitive, exactly the kind of issue MBE is meant to
-surface.
+survives the locked 80-run image holdout, washed out in the earlier text-only
+combined audit, survives in the locked 100-run text holdout, and reverses in the
+full image+text pool. That is a stronger story than "FIM_norm fails": the
+result is task-dependent, pooling-sensitive, and protocol-sensitive, exactly
+the kind of issue MBE is meant to surface.
 
 ## 6. Metrics That Wash Out Most Often
 

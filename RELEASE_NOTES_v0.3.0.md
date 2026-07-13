@@ -5,7 +5,7 @@ PyPI: https://pypi.org/project/mbe-eval/0.3.0/
 This release makes `mbe-eval` easier to evaluate as a standalone research
 package and aligns the package metadata with the renamed repository:
 
-https://github.com/AparajeetS/metric-audit-paper
+https://github.com/AparajeetS/marginal-baseline-eval
 
 ## Highlights
 

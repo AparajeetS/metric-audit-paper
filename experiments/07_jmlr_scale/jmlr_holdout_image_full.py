@@ -1,4 +1,18 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+
+import os
+
+os.environ.setdefault('CEI_SUITE', 'image')
+os.environ.setdefault('CEI_ARCHS', 'cnn,resnet,wide_resnet,vit')
+os.environ.setdefault('CEI_MODELS_PER_ARCH', '20')
+os.environ.setdefault('CEI_EPOCHS', '25')
+os.environ.setdefault('CEI_N_TRAIN', '20000')
+os.environ.setdefault('CEI_N_TEST', '5000')
+os.environ.setdefault('CEI_METRIC_N', '16')
+os.environ.setdefault('CEI_BATCH_SIZE', '128')
+os.environ.setdefault('CEI_SEED', '20260705')
+os.environ.setdefault('CEI_OUT', 'jmlr_holdout_image_timeboxed_results.csv')
+
 
 import argparse
 import copy
@@ -7,30 +21,10 @@ import json
 import math
 import os
 import random
-import subprocess
-import sys
 import time
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-
-
-if Path("/kaggle/working").exists() and os.environ.get("CEI_SKIP_TORCH_INSTALL") != "1":
-    subprocess.check_call(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "--quiet",
-            "--force-reinstall",
-            "--no-cache-dir",
-            "torch==2.4.1",
-            "torchvision==0.19.1",
-            "--index-url",
-            "https://download.pytorch.org/whl/cu118",
-        ]
-    )
 
 import numpy as np
 import torch
@@ -441,12 +435,14 @@ def gradient_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict
 def fisher_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict[str, float]:
     model.eval()
     rows = []
+    losses = []
     for i in range(len(x)):
         model.zero_grad(set_to_none=True)
         logits = model(x[i : i + 1])
         yi = y[i : i + 1]
         loss = loss_for_logits(logits, yi)
         loss.backward()
+        losses.append(float(loss.detach().cpu()))
         rows.append(torch.cat([p.grad.detach().flatten().cpu().float() for p in model.parameters() if p.grad is not None]))
     if not rows:
         return {}
@@ -464,6 +460,25 @@ def fisher_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict[s
     noise_scale = float(per_sample_var / (mean_g.square().sum() + 1e-12))
     p = eigs / (eigs.sum() + 1e-12)
     entropy = float(-(p[p > 0] * p[p > 0].log()).sum())
+    norms = norms_sq.sqrt().clamp_min(1e-12)
+    unit_g = G / norms[:, None]
+    unit_eigs = torch.linalg.eigvalsh((unit_g @ unit_g.T) / len(rows)).clamp_min(0)
+    unit_erank = effective_rank_from_eigs(unit_eigs)
+    loss_vec = torch.tensor(losses, dtype=G.dtype).clamp_min(1e-6)
+    loss_scaled_g = G / loss_vec[:, None]
+    loss_scaled_eigs = torch.linalg.eigvalsh((loss_scaled_g @ loss_scaled_g.T) / len(rows)).clamp_min(0)
+    loss_scaled_erank = effective_rank_from_eigs(loss_scaled_eigs)
+    energy = norms_sq.clamp_min(0)
+    energy_p = energy / (energy.sum() + 1e-12)
+    energy_entropy = float(-(energy_p[energy_p > 0] * energy_p[energy_p > 0].log()).sum())
+    sorted_energy = torch.sort(energy).values
+    n_energy = len(sorted_energy)
+    gini_num = (2 * torch.arange(1, n_energy + 1, dtype=sorted_energy.dtype) - n_energy - 1) * sorted_energy
+    energy_gini = float(gini_num.sum() / (n_energy * sorted_energy.sum() + 1e-12))
+    if len(rows) >= 3 and float(loss_vec.std(unbiased=False)) > 1e-12 and float(norms.std(unbiased=False)) > 1e-12:
+        grad_loss_corr = float(torch.corrcoef(torch.stack([loss_vec.log(), norms.log()]))[0, 1])
+    else:
+        grad_loss_corr = math.nan
     return {
         "fisher_trace": trace,
         "fisher_spectral": spectral,
@@ -471,8 +486,15 @@ def fisher_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict[s
         "fisher_entropy": entropy,
         "fim_erank": erank,
         "fim_norm": erank / len(rows),
+        "fim_unit_erank": unit_erank,
+        "fim_unit_norm": unit_erank / len(rows),
+        "fim_loss_scaled_erank": loss_scaled_erank,
+        "fim_loss_scaled_norm": loss_scaled_erank / len(rows),
         "fisher_condition": condition,
         "grad_noise_scale": noise_scale,
+        "gradient_energy_entropy": energy_entropy,
+        "gradient_energy_gini": energy_gini,
+        "grad_loss_logcorr": grad_loss_corr,
         "per_sample_grad_norm_mean": float(norms_sq.sqrt().mean()),
         "per_sample_grad_norm_std": float(norms_sq.sqrt().std(unbiased=False)),
     }
@@ -691,18 +713,18 @@ def append_row(path: Path, row: dict[str, float | int | str]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Large-scale MBE metric battery runner.")
-    parser.add_argument("--suite", choices=["image", "text"], default=os.environ.get("CEI_SUITE", "text"))
+    parser = argparse.ArgumentParser(description="JMLR-scale MBE metric battery runner.")
+    parser.add_argument("--suite", choices=["image", "text"], default=os.environ.get("CEI_SUITE", "image"))
     parser.add_argument("--architectures", default=os.environ.get("CEI_ARCHS", "cnn,resnet,wide_resnet,vit"))
-    parser.add_argument("--models-per-arch", type=int, default=int(os.environ.get("CEI_MODELS_PER_ARCH", "120")))
-    parser.add_argument("--epochs", type=int, default=int(os.environ.get("CEI_EPOCHS", "12")))
-    parser.add_argument("--batch-size", type=int, default=int(os.environ.get("CEI_BATCH_SIZE", "64")))
-    parser.add_argument("--n-train", type=int, default=int(os.environ.get("CEI_N_TRAIN", "80000")))
-    parser.add_argument("--n-test", type=int, default=int(os.environ.get("CEI_N_TEST", "12000")))
-    parser.add_argument("--metric-n", type=int, default=int(os.environ.get("CEI_METRIC_N", "12")))
+    parser.add_argument("--models-per-arch", type=int, default=int(os.environ.get("CEI_MODELS_PER_ARCH", "30")))
+    parser.add_argument("--epochs", type=int, default=int(os.environ.get("CEI_EPOCHS", "20")))
+    parser.add_argument("--batch-size", type=int, default=int(os.environ.get("CEI_BATCH_SIZE", "128")))
+    parser.add_argument("--n-train", type=int, default=int(os.environ.get("CEI_N_TRAIN", "12000")))
+    parser.add_argument("--n-test", type=int, default=int(os.environ.get("CEI_N_TEST", "3000")))
+    parser.add_argument("--metric-n", type=int, default=int(os.environ.get("CEI_METRIC_N", "16")))
     parser.add_argument("--block-size", type=int, default=int(os.environ.get("CEI_BLOCK_SIZE", "96")))
     parser.add_argument("--seed", type=int, default=int(os.environ.get("CEI_SEED", "20260627")))
-    parser.add_argument("--out", default=os.environ.get("CEI_OUT", "jmlr_confirm_text_results.csv"))
+    parser.add_argument("--out", default=os.environ.get("CEI_OUT", "jmlr_scale_results.csv"))
     parser.add_argument("--no-heavy", action="store_true")
     args = parser.parse_args()
 
@@ -728,12 +750,17 @@ def main() -> None:
         "metrics": [
             "fim_norm",
             "fim_erank",
+            "fim_unit_norm",
+            "fim_loss_scaled_norm",
             "fisher_trace",
             "fisher_spectral",
             "fisher_stable_rank",
             "fisher_entropy",
             "fisher_condition",
             "grad_noise_scale",
+            "gradient_energy_entropy",
+            "gradient_energy_gini",
+            "grad_loss_logcorr",
             "grad_norm",
             "grad_l1",
             "grad_linf",
@@ -777,7 +804,7 @@ def main() -> None:
                 n_test=args.n_test,
                 metric_n=args.metric_n,
                 block_size=args.block_size,
-                heavy_metrics=False,
+                heavy_metrics=not args.no_heavy,
                 device=device,
             )
             append_row(out_path, row)

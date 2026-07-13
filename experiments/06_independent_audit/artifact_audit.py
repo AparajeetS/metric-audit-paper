@@ -11,9 +11,6 @@ import pandas as pd
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_DOWNLOAD = Path(r"C:\Users\apara\Downloads\kaggle_cifar10_results (2).csv")
-
-
 @dataclass
 class DatasetSpec:
     name: str
@@ -112,9 +109,13 @@ def dataset_specs(extra_csv: Path | None) -> list[DatasetSpec]:
 
 def summarize_dataset(spec: DatasetSpec) -> dict:
     df = pd.read_csv(spec.path)
+    try:
+        display_path = spec.path.resolve().relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        display_path = f"external/{spec.path.name}"
     summary = {
         "name": spec.name,
-        "path": str(spec.path),
+        "path": display_path,
         "rows": int(len(df)),
         "cols": int(len(df.columns)),
         "family": spec.family,
@@ -180,12 +181,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Independently audit saved CSV artifacts.")
     parser.add_argument(
         "--downloaded-csv",
-        default=str(DEFAULT_DOWNLOAD),
+        default="",
         help="Optional external Kaggle CSV to include in the audit.",
     )
     args = parser.parse_args()
 
-    downloaded_csv = Path(args.downloaded_csv)
+    downloaded_csv = Path(args.downloaded_csv) if args.downloaded_csv else None
     specs = dataset_specs(downloaded_csv)
     results = [summarize_dataset(spec) for spec in specs if spec.path.exists()]
 

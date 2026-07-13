@@ -10,6 +10,13 @@ mbe_reports/
 kaggle_tmp/
 *.log
 *.tar.gz
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+kaggle.json
+.pypirc
 experiments/**/data/
 experiments/**/out/data/
 experiments/**/kaggle_downloads/**/data/

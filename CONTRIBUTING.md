@@ -6,8 +6,8 @@ reproducible audits, clearer documentation, and careful negative results.
 ## Local Setup
 
 ```bash
-git clone https://github.com/AparajeetS/metric-audit-paper.git
-cd metric-audit-paper
+git clone https://github.com/AparajeetS/marginal-baseline-eval.git
+cd marginal-baseline-eval
 pip install -e ".[dev]"
 python -m pytest -q
 ```
@@ -22,14 +22,16 @@ mbe-eval-demo --bootstrap 200
 
 Your CSV should contain one row per trained model/run, one held-out target, one
 or more metric columns, and control columns such as learning rate, optimizer,
-architecture, task, and seed.
+architecture, and task. Treat seeds as repeated observations or grouping units,
+not as an ordered numeric covariate.
 
 ```bash
 mbe-eval-audit \
   --csv runs.csv \
   --metrics fim_norm,val_loss,grad_norm \
   --target final_acc \
-  --controls lr,wd,optimizer,arch,seed \
+  --controls lr,wd,optimizer,arch \
+  --groupby task \
   --output audit_report.md
 ```
 
@@ -47,6 +49,18 @@ For new experiment results, include:
 
 Do not change metric lists, thresholds, or control sets after seeing results
 unless the change is explicitly labeled exploratory.
+
+New confirmatory experiments must follow the active
+[`docs/MBE_2_RESEARCH_PROGRAM.md`](docs/MBE_2_RESEARCH_PROGRAM.md), not the
+legacy v1 protocol.
+
+## Pull Requests
+
+- Keep research claims proportional to the design and uncertainty.
+- Add tests for package behavior and a reproduction command for analyses.
+- Do not commit credentials, private datasets, or machine-specific paths.
+- Explain whether a change is exploratory, confirmatory, or software-only.
+- Confirm `python -m pytest -q` and `python -m build` pass locally.
 
 ## Documentation Contributions
 

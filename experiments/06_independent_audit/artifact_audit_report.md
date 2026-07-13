@@ -1,10 +1,10 @@
-﻿# Independent Artifact Audit
+# Independent Artifact Audit
 
 This report ignores manuscript intent and recomputes rank-based correlations directly from saved CSV artifacts.
 
 ## mlp_large_grid_v3_asam
 
-- file: `C:\Research\cei\metric-audit-paper-code\experiments\04_falsification\out\large_grid_v3_asam.csv`
+- file: `experiments/04_falsification/out/large_grid_v3_asam.csv`
 - shape: `1000 x 11`
 - family: `mlp`
 - mean final accuracy: `0.9408`
@@ -20,7 +20,7 @@ This report ignores manuscript intent and recomputes rank-based correlations dir
 
 ## mlp_unified_grid_current
 
-- file: `C:\Research\cei\metric-audit-paper-code\experiments\04_falsification\out\unified_grid.csv`
+- file: `experiments/04_falsification/out/unified_grid.csv`
 - shape: `1000 x 27`
 - family: `mlp`
 - mean final accuracy: `0.9422`
@@ -47,7 +47,7 @@ This report ignores manuscript intent and recomputes rank-based correlations dir
 
 ## cnn_kaggle_local_50
 
-- file: `C:\Research\cei\metric-audit-paper-code\experiments\05_kaggle\kaggle_cifar10_results.csv`
+- file: `experiments/05_kaggle/kaggle_cifar10_results.csv`
 - shape: `50 x 9`
 - family: `cnn`
 - mean final accuracy: `0.4985`
@@ -63,7 +63,7 @@ This report ignores manuscript intent and recomputes rank-based correlations dir
 
 ## cnn_kaggle_download_250
 
-- file: `C:\Users\apara\Downloads\kaggle_cifar10_results (2).csv`
+- file: `external/kaggle_cifar10_results (2).csv`
 - shape: `250 x 22`
 - family: `cnn`
 - mean final accuracy: `0.5801`

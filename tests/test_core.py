@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from mbe_eval import (
+    __version__,
     MBEEvaluator,
     audit_csv,
     audit_metric,
@@ -12,6 +13,10 @@ from mbe_eval import (
     run_demo,
     summarize_audit,
 )
+
+
+def test_public_version_matches_release():
+    assert __version__ == "0.3.1"
 
 
 def synthetic_frame(seed=0, n=300):

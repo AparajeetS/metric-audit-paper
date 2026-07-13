@@ -1,6 +1,11 @@
 # MBE Protocol Freeze
 
-Status: draft freeze for the current evidence set.
+> **Legacy MBE 1.0 protocol.** This document is preserved to explain the
+> existing pilot artifacts. It is superseded by
+> [`docs/MBE_2_RESEARCH_PROGRAM.md`](docs/MBE_2_RESEARCH_PROGRAM.md) and must
+> not be used to launch future compute.
+
+Status: historical draft freeze for the current evidence set.
 
 This document defines the evaluation protocol used for the current
 Marginal Baseline Evaluation (MBE) evidence and the protocol that should be

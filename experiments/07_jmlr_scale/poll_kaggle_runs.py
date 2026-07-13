@@ -14,12 +14,13 @@ KERNELS = {
     "confirm_text": "aparajeetshadangi/cei-mbe-confirm-text",
 }
 
-KAGGLE_EXE = Path(r"C:\Users\apara\AppData\Local\Python\pythoncore-3.14-64\Scripts\kaggle.exe")
-
-
 def run_kaggle(args: list[str]) -> subprocess.CompletedProcess[str]:
-    exe = str(KAGGLE_EXE) if KAGGLE_EXE.exists() else "kaggle"
-    return subprocess.run([exe, *args], check=False, text=True, capture_output=True)
+    return subprocess.run(
+        [sys.executable, "-m", "kaggle", *args],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
 
 
 def status(kernel: str) -> tuple[str, str]:

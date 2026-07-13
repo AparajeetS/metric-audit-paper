@@ -1,6 +1,10 @@
 # Next Experiment Protocol
 
-Status: pre-registration draft for the next GPU-funded replication.
+> **Superseded MBE 1.0 plan.** Do not launch this experiment. The active design
+> is [`docs/MBE_2_RESEARCH_PROGRAM.md`](docs/MBE_2_RESEARCH_PROGRAM.md), with
+> gates in [`docs/JMLR_MILESTONE_ROADMAP.md`](docs/JMLR_MILESTONE_ROADMAP.md).
+
+Status: historical pre-registration draft.
 
 This protocol should be frozen before launching new compute.
 

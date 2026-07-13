@@ -239,8 +239,6 @@ def load_cifar(batch_size: int, n_train: int, n_test: int, seed: int):
         test_subset = Subset(test_ds, test_idx)
     except Exception:
         base = OUT_DIR.parent / "05_kaggle" / "data" / "cifar-10-batches-py"
-        if not base.exists():
-            base = Path("C:/Research/cei/metric-audit-paper-code/experiments/05_kaggle/data/cifar-10-batches-py")
         train_x, train_y, test_x, test_y = load_cifar_pickles(base)
         rng = np.random.default_rng(seed)
         train_idx = rng.choice(len(train_x), size=min(n_train, len(train_x)), replace=False)
@@ -443,12 +441,14 @@ def gradient_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict
 def fisher_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict[str, float]:
     model.eval()
     rows = []
+    losses = []
     for i in range(len(x)):
         model.zero_grad(set_to_none=True)
         logits = model(x[i : i + 1])
         yi = y[i : i + 1]
         loss = loss_for_logits(logits, yi)
         loss.backward()
+        losses.append(float(loss.detach().cpu()))
         rows.append(torch.cat([p.grad.detach().flatten().cpu().float() for p in model.parameters() if p.grad is not None]))
     if not rows:
         return {}
@@ -466,6 +466,25 @@ def fisher_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict[s
     noise_scale = float(per_sample_var / (mean_g.square().sum() + 1e-12))
     p = eigs / (eigs.sum() + 1e-12)
     entropy = float(-(p[p > 0] * p[p > 0].log()).sum())
+    norms = norms_sq.sqrt().clamp_min(1e-12)
+    unit_g = G / norms[:, None]
+    unit_eigs = torch.linalg.eigvalsh((unit_g @ unit_g.T) / len(rows)).clamp_min(0)
+    unit_erank = effective_rank_from_eigs(unit_eigs)
+    loss_vec = torch.tensor(losses, dtype=G.dtype).clamp_min(1e-6)
+    loss_scaled_g = G / loss_vec[:, None]
+    loss_scaled_eigs = torch.linalg.eigvalsh((loss_scaled_g @ loss_scaled_g.T) / len(rows)).clamp_min(0)
+    loss_scaled_erank = effective_rank_from_eigs(loss_scaled_eigs)
+    energy = norms_sq.clamp_min(0)
+    energy_p = energy / (energy.sum() + 1e-12)
+    energy_entropy = float(-(energy_p[energy_p > 0] * energy_p[energy_p > 0].log()).sum())
+    sorted_energy = torch.sort(energy).values
+    n_energy = len(sorted_energy)
+    gini_num = (2 * torch.arange(1, n_energy + 1, dtype=sorted_energy.dtype) - n_energy - 1) * sorted_energy
+    energy_gini = float(gini_num.sum() / (n_energy * sorted_energy.sum() + 1e-12))
+    if len(rows) >= 3 and float(loss_vec.std(unbiased=False)) > 1e-12 and float(norms.std(unbiased=False)) > 1e-12:
+        grad_loss_corr = float(torch.corrcoef(torch.stack([loss_vec.log(), norms.log()]))[0, 1])
+    else:
+        grad_loss_corr = math.nan
     return {
         "fisher_trace": trace,
         "fisher_spectral": spectral,
@@ -473,8 +492,15 @@ def fisher_metrics(model: nn.Module, x: torch.Tensor, y: torch.Tensor) -> dict[s
         "fisher_entropy": entropy,
         "fim_erank": erank,
         "fim_norm": erank / len(rows),
+        "fim_unit_erank": unit_erank,
+        "fim_unit_norm": unit_erank / len(rows),
+        "fim_loss_scaled_erank": loss_scaled_erank,
+        "fim_loss_scaled_norm": loss_scaled_erank / len(rows),
         "fisher_condition": condition,
         "grad_noise_scale": noise_scale,
+        "gradient_energy_entropy": energy_entropy,
+        "gradient_energy_gini": energy_gini,
+        "grad_loss_logcorr": grad_loss_corr,
         "per_sample_grad_norm_mean": float(norms_sq.sqrt().mean()),
         "per_sample_grad_norm_std": float(norms_sq.sqrt().std(unbiased=False)),
     }
@@ -730,12 +756,17 @@ def main() -> None:
         "metrics": [
             "fim_norm",
             "fim_erank",
+            "fim_unit_norm",
+            "fim_loss_scaled_norm",
             "fisher_trace",
             "fisher_spectral",
             "fisher_stable_rank",
             "fisher_entropy",
             "fisher_condition",
             "grad_noise_scale",
+            "gradient_energy_entropy",
+            "gradient_energy_gini",
+            "grad_loss_logcorr",
             "grad_norm",
             "grad_l1",
             "grad_linf",

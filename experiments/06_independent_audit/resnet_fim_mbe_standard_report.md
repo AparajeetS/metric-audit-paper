@@ -1,6 +1,6 @@
 ﻿# ResNet FIM_norm MBE Smoke Test
 
-- csv: `C:\Research\cei\metric-audit-paper-code\experiments\06_independent_audit\resnet_fim_mbe_standard.csv`
+- csv: `experiments/06_independent_audit/resnet_fim_mbe_standard.csv`
 - rows: `18`
 - model: compact CIFAR ResNet with BatchNorm, trained on CPU
 - MBE control covariates: rank(`lr`), rank(`wd`)

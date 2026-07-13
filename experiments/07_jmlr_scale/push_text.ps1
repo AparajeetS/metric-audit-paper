@@ -1,6 +1,5 @@
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$kaggle = "C:\Users\apara\AppData\Local\Python\pythoncore-3.14-64\Scripts\kaggle.exe"
 
 @'
 {
@@ -18,4 +17,4 @@ $kaggle = "C:\Users\apara\AppData\Local\Python\pythoncore-3.14-64\Scripts\kaggle
 }
 '@ | Set-Content -LiteralPath (Join-Path $here "kernel-metadata.json") -Encoding UTF8
 
-& $kaggle kernels push -p $here
+& python -m kaggle kernels push -p $here

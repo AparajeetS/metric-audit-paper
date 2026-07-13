@@ -1,7 +1,7 @@
 [
   {
     "name": "mlp_large_grid_v3_asam",
-    "path": "C:\\Research\\cei\\metric-audit-paper-code\\experiments\\04_falsification\\out\\large_grid_v3_asam.csv",
+    "path": "experiments/04_falsification/out/large_grid_v3_asam.csv",
     "rows": 1000,
     "cols": 11,
     "family": "mlp",
@@ -42,7 +42,7 @@
   },
   {
     "name": "mlp_unified_grid_current",
-    "path": "C:\\Research\\cei\\metric-audit-paper-code\\experiments\\04_falsification\\out\\unified_grid.csv",
+    "path": "experiments/04_falsification/out/unified_grid.csv",
     "rows": 1000,
     "cols": 27,
     "family": "mlp",
@@ -108,7 +108,7 @@
   },
   {
     "name": "cnn_kaggle_local_50",
-    "path": "C:\\Research\\cei\\metric-audit-paper-code\\experiments\\05_kaggle\\kaggle_cifar10_results.csv",
+    "path": "experiments/05_kaggle/kaggle_cifar10_results.csv",
     "rows": 50,
     "cols": 9,
     "family": "cnn",
@@ -149,7 +149,7 @@
   },
   {
     "name": "cnn_kaggle_download_250",
-    "path": "C:\\Users\\apara\\Downloads\\kaggle_cifar10_results (2).csv",
+    "path": "external/kaggle_cifar10_results (2).csv",
     "rows": 250,
     "cols": 22,
     "family": "cnn",

@@ -239,8 +239,6 @@ def load_cifar(batch_size: int, n_train: int, n_test: int, seed: int):
         test_subset = Subset(test_ds, test_idx)
     except Exception:
         base = OUT_DIR.parent / "05_kaggle" / "data" / "cifar-10-batches-py"
-        if not base.exists():
-            base = Path("C:/Research/cei/metric-audit-paper-code/experiments/05_kaggle/data/cifar-10-batches-py")
         train_x, train_y, test_x, test_y = load_cifar_pickles(base)
         rng = np.random.default_rng(seed)
         train_idx = rng.choice(len(train_x), size=min(n_train, len(train_x)), replace=False)

@@ -6,8 +6,8 @@ requires fresh GPU compute.
 ## Local Setup
 
 ```bash
-git clone https://github.com/AparajeetS/metric-audit-paper.git
-cd metric-audit-paper
+git clone https://github.com/AparajeetS/marginal-baseline-eval.git
+cd marginal-baseline-eval
 python -m venv .venv
 .venv\Scripts\activate
 pip install -e ".[dev]"
@@ -29,8 +29,8 @@ This writes `mbe_demo_report.md` and does not require GPU compute.
 
 ## Regenerate MBE Tables From Saved CSVs
 
-The current paper-scale summaries are generated from saved Kaggle CSV outputs.
-Use the explicit CSV paths below so the command reproduces the tracked headline
+The legacy pilot summaries are generated from four committed Kaggle CSV
+outputs. Use the explicit paths below so the command reproduces the tracked
 tables rather than accidentally auditing an empty directory:
 
 ```bash
@@ -64,7 +64,9 @@ Expected headline outputs include:
 - `experiments/07_jmlr_scale/jmlr_full_confirmed_680_strict_loss_mbe_summary.md`
 
 The key raw result artifacts and SHA256 hashes are listed in
-`experiments/07_jmlr_scale/ARTIFACTS.md`.
+[`experiments/07_jmlr_scale/ARTIFACTS.md`](experiments/07_jmlr_scale/ARTIFACTS.md).
+These commands reproduce the v1 summaries; they do not repair the scientific
+validity limitations described in the evidence ledger.
 
 ## CPU-Only Uncertainty And Threshold Sensitivity
 
@@ -123,11 +125,12 @@ Or use the helper scripts:
 .\experiments\07_jmlr_scale\push_text.ps1
 ```
 
-The current confirmed pool used:
+The legacy pilot pool used:
 
 - 480 image models: CNN, ResNet, ViT, WideResNet on CIFAR-10.
-- 200 text models: character-transformer language models.
-- Default MBE controls: `lr`, `wd`, `dropout`, `optimizer`, `arch`, `task`, `seed`.
+- 200 text-model rows from an invalid causal-LM setup, retained only for
+  provenance and software regression checks.
+- Default v1 controls: `lr`, `wd`, `dropout`, `optimizer`, `arch`, `task`, `seed`.
 - Strict MBE controls: default controls plus `val_loss`.
 
 ## Evidence Files
@@ -141,12 +144,12 @@ Use these files when checking the research claims:
 
 ## Compute Gap
 
-The repository is intentionally usable without fresh compute. The current gap is
-not software accessibility; it is replication scale. The next grant-funded or
-GPU-credit-funded step should be:
+The repository is intentionally usable without fresh compute. Submission-grade
+evidence requires both corrected methods and replication scale. The active
+sequence is defined in [`docs/JMLR_MILESTONE_ROADMAP.md`](docs/JMLR_MILESTONE_ROADMAP.md):
 
-1. freeze the MBE protocol;
-2. launch a locked holdout replication;
-3. bootstrap headline correlations;
-4. run control-set ablations;
-5. publish updated CSVs, hashes, and summaries.
+1. freeze the MBE 2.0 protocol and claim ledger;
+2. validate the implementation on synthetic controls and public corpora;
+3. run corrected image and causally masked text pilots;
+4. launch locked holdout replications only after the pilot gate passes;
+5. publish raw artifacts, hashes, uncertainty, and all planned analyses.

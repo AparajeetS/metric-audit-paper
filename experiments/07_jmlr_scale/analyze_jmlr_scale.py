@@ -17,6 +17,13 @@ DEFAULT_METRICS = [
     "fisher_stable_rank",
     "fisher_entropy",
     "fisher_condition",
+    "fim_unit_erank",
+    "fim_unit_norm",
+    "fim_loss_scaled_erank",
+    "fim_loss_scaled_norm",
+    "gradient_energy_entropy",
+    "gradient_energy_gini",
+    "grad_loss_logcorr",
     "grad_noise_scale",
     "grad_norm",
     "grad_l1",
@@ -52,6 +59,8 @@ DEFAULT_METRICS = [
     "val_loss",
     "random_metric",
 ]
+
+AUTO_METRIC_PREFIXES = ("resid_", "orth_", "disagree_", "cei_")
 
 
 def rank_values(series: pd.Series) -> np.ndarray:
@@ -138,9 +147,18 @@ def load_inputs(paths: list[Path]) -> pd.DataFrame:
     return df
 
 
-def summarize_group(df: pd.DataFrame, group_name: str, covars: list[str], target: str) -> list[dict]:
+def metric_list(df: pd.DataFrame, extra_metrics: list[str], all_numeric: bool) -> list[str]:
+    metrics = list(DEFAULT_METRICS)
+    metrics.extend(extra_metrics)
+    metrics.extend([c for c in df.columns if c.startswith(AUTO_METRIC_PREFIXES)])
+    if all_numeric:
+        metrics.extend([c for c in df.columns if is_numeric_dtype(df[c])])
+    return list(dict.fromkeys([m for m in metrics if m in df.columns]))
+
+
+def summarize_group(df: pd.DataFrame, group_name: str, covars: list[str], target: str, metrics: list[str]) -> list[dict]:
     rows = []
-    for metric in DEFAULT_METRICS:
+    for metric in metrics:
         if metric not in df.columns or target not in df.columns:
             continue
         if metric in covars or metric == target:
@@ -205,18 +223,30 @@ def main() -> None:
         help="Comma-separated MBE covariates. Categorical covariates are one-hot encoded.",
     )
     parser.add_argument("--out-prefix", default="jmlr_scale_audit")
+    parser.add_argument(
+        "--extra-metrics",
+        default="",
+        help="Comma-separated additional metric columns. Columns starting resid_, orth_, or disagree_ are included automatically.",
+    )
+    parser.add_argument(
+        "--all-numeric",
+        action="store_true",
+        help="Audit every numeric non-covariate column. Useful for exploratory debugging; not recommended for paper tables.",
+    )
     args = parser.parse_args()
 
     covars = [c.strip() for c in args.covars.split(",") if c.strip()]
+    extra_metrics = [m.strip() for m in args.extra_metrics.split(",") if m.strip()]
     df = load_inputs(args.inputs)
-    rows = summarize_group(df, "pooled", covars, args.target)
+    metrics = metric_list(df, extra_metrics, args.all_numeric)
+    rows = summarize_group(df, "pooled", covars, args.target, metrics)
     if "suite" in df.columns:
         for suite, g in df.groupby("suite"):
-            rows.extend(summarize_group(g, f"suite={suite}", covars, args.target))
+            rows.extend(summarize_group(g, f"suite={suite}", covars, args.target, metrics))
     if "arch" in df.columns:
         within_covars = [c for c in covars if c != "arch"]
         for arch, g in df.groupby("arch"):
-            rows.extend(summarize_group(g, f"arch={arch}", within_covars, args.target))
+            rows.extend(summarize_group(g, f"arch={arch}", within_covars, args.target, metrics))
 
     summary = pd.DataFrame(rows)
     if summary.empty:

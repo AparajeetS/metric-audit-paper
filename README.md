@@ -1,12 +1,14 @@
 # Marginal Baseline Evaluation
 
 [![PyPI](https://img.shields.io/pypi/v/mbe-eval.svg)](https://pypi.org/project/mbe-eval/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/AparajeetS/marginal-baseline-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/AparajeetS/marginal-baseline-eval/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/pypi/pyversions/mbe-eval.svg)](https://pypi.org/project/mbe-eval/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/LICENSE)
 
 **Marginal Baseline Evaluation (MBE)** is an audit protocol for testing whether
 machine-learning training metrics still predict held-out performance after
 controlling for ordinary baselines such as learning rate, weight decay,
-optimizer, architecture, task, seed, and validation loss.
+optimizer, architecture, task, and training-state measurements.
 
 The project started from a concrete failure mode: a proposed metric can look
 promising under raw pooled correlation while actually tracking easier baselines,
@@ -19,22 +21,42 @@ rank-correlation.
 This is an active research direction with an accompanying Python package,
 Kaggle-scale experiment artifacts, and a public walkthrough notebook.
 
+**Software status:** `mbe-eval` v0.3.1 implements the stable MBE v1
+partial-rank audit. MBE 2.0 is the active research design and is not yet fully
+implemented or empirically validated. See the [open research inventory](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/OPEN_RESEARCH.md)
+for a precise map of what is available now.
+
+The current direction is **MBE 2.0**, a multi-environment metric-validation
+framework that separates unconditional association, incremental information,
+transport, intervention response, and measurement reliability. The technical
+[research program](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_2_RESEARCH_PROGRAM.md), gated [JMLR roadmap](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/JMLR_MILESTONE_ROADMAP.md),
+and [compute plan](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/COMPUTE_AND_COST_PLAN.md) are the source of truth for new work.
+
 - Package: [`mbe-eval`](https://pypi.org/project/mbe-eval/)
 - Public notebook: [Audit ML Training Metrics with MBE](https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe)
-- Documentation map: [docs/README.md](docs/README.md)
-- Evidence ledger: [SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md)
-- Reproducibility notes: [REPRODUCIBILITY.md](REPRODUCIBILITY.md)
-- Protocol freeze: [PROTOCOL_FREEZE.md](PROTOCOL_FREEZE.md)
-- Metric taxonomy: [METRIC_TAXONOMY.md](METRIC_TAXONOMY.md)
-- Figures: [FIGURES.md](FIGURES.md)
-- Project brief: [PROJECT_BRIEF.md](PROJECT_BRIEF.md)
-- Next experiment protocol: [NEXT_EXPERIMENT_PROTOCOL.md](NEXT_EXPERIMENT_PROTOCOL.md)
-- Paper skeleton: [PAPER_SKELETON.md](PAPER_SKELETON.md)
-- Paper notes: [PAPER.md](PAPER.md) and [PUBLICATION_STRATEGY.md](PUBLICATION_STRATEGY.md)
-- Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
-- Roadmap: [ROADMAP.md](ROADMAP.md)
+- Documentation map: [docs/README.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/README.md)
+- Evidence ledger: [SUPPORTING_EVIDENCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SUPPORTING_EVIDENCE.md)
+- Reproducibility notes: [REPRODUCIBILITY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/REPRODUCIBILITY.md)
+- Legacy v1 protocol: [PROTOCOL_FREEZE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PROTOCOL_FREEZE.md)
+- Metric taxonomy: [METRIC_TAXONOMY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/METRIC_TAXONOMY.md)
+- Figures: [FIGURES.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/FIGURES.md)
+- Project brief: [PROJECT_BRIEF.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PROJECT_BRIEF.md)
+- Superseded v1 experiment protocol: [NEXT_EXPERIMENT_PROTOCOL.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/NEXT_EXPERIMENT_PROTOCOL.md)
+- Paper skeleton: [PAPER_SKELETON.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PAPER_SKELETON.md)
+- Paper notes: [PAPER.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PAPER.md) and [PUBLICATION_STRATEGY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PUBLICATION_STRATEGY.md)
+- Contribution guide: [CONTRIBUTING.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/CONTRIBUTING.md)
+- Open research inventory: [OPEN_RESEARCH.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/OPEN_RESEARCH.md)
+- Governance: [GOVERNANCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/GOVERNANCE.md)
+- Roadmap: [ROADMAP.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/ROADMAP.md)
 
-The latest confirmed evidence set contains **680 trained models**:
+## Legacy Pilot Evidence
+
+The existing **680-row pilot ledger** is exploratory evidence, not a
+submission-grade independent model sample. It includes repeated configurations,
+and the text experiment lacks a causal attention mask and permits label leakage.
+Its results motivate the new protocol but must not support confirmatory claims.
+
+The ledger contains:
 
 - 480 CIFAR-10 image models across CNN, ResNet, ViT, and WideResNet settings.
 - 200 character-transformer language models.
@@ -54,7 +76,7 @@ The current Kaggle-scale runs support a selective audit story:
 - FIM_norm is the motivating case study: it looked promising under conventional
   metric validation, then became task-dependent under MBE.
 
-FIM_norm summary from the current confirmed pool:
+FIM_norm summary from the legacy pilot pool:
 
 | Audit | n | Raw rho | MBE partial rho | Class |
 |---|---:|---:|---:|---|
@@ -66,7 +88,7 @@ FIM_norm summary from the current confirmed pool:
 | Full image+text pool, strict + validation loss | 680 | +0.225 | -0.300 | reverse-inversion |
 
 Full result tables and interpretation are in
-[SUPPORTING_EVIDENCE.md](SUPPORTING_EVIDENCE.md).
+[SUPPORTING_EVIDENCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SUPPORTING_EVIDENCE.md).
 CPU-only bootstrap confidence intervals and threshold sensitivity are summarized
 in the no-compute uncertainty report listed from the reproducibility guide.
 
@@ -75,6 +97,9 @@ in the no-compute uncertainty report listed from the reproducibility guide.
 ```bash
 pip install mbe-eval
 ```
+
+Supported Python versions are 3.9 and newer; CI currently exercises 3.9, 3.11,
+3.13, and 3.14.
 
 Optional FIM_norm extraction utilities require PyTorch:
 
@@ -85,8 +110,8 @@ pip install "mbe-eval[torch]"
 For local development:
 
 ```bash
-git clone https://github.com/AparajeetS/metric-audit-paper.git
-cd metric-audit-paper
+git clone https://github.com/AparajeetS/marginal-baseline-eval.git
+cd marginal-baseline-eval
 pip install -e ".[dev]"
 ```
 
@@ -110,7 +135,8 @@ mbe-eval-audit \
   --csv runs.csv \
   --metrics fim_norm,val_loss_ep20,grad_norm \
   --target test_accuracy \
-  --controls learning_rate,weight_decay,optimizer,arch,seed \
+  --controls learning_rate,weight_decay,optimizer,arch \
+  --groupby task \
   --bootstrap 200 \
   --output audit_report.md
 ```
@@ -149,7 +175,7 @@ candidate metric columns, and baseline/design columns to control.
 ## Reproduce Current Tables
 
 The main paper-scale audit can be regenerated from saved result CSVs. See
-[REPRODUCIBILITY.md](REPRODUCIBILITY.md) for the exact legacy artifact command.
+[REPRODUCIBILITY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/REPRODUCIBILITY.md) for the exact legacy artifact command.
 
 The public notebook source lives in:
 
@@ -158,12 +184,12 @@ kaggle/mbe_metric_audit/how_to_audit_ml_training_metrics_mbe.ipynb
 ```
 
 Kaggle training scripts and raw result manifests are documented in
-[REPRODUCIBILITY.md](REPRODUCIBILITY.md) and the large-scale artifact manifest.
+[REPRODUCIBILITY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/REPRODUCIBILITY.md) and the large-scale artifact manifest.
 
 ## Repository Layout
 
 ```text
-metric-audit-paper/
+marginal-baseline-eval/
 +-- mbe_eval/                  # installable MBE package
 +-- examples/                  # small local examples
 +-- experiments/               # paper-scale and exploratory experiments
@@ -185,6 +211,9 @@ and more useful:
 > MBE audits whether a metric retains signal beyond ordinary training baselines
 > and experimental design variables.
 
+This is a methodological hypothesis under active validation, not a claim that
+the current pilot establishes universal metric failure or causal effects.
+
 ## Citation
 
 ```bibtex
@@ -198,4 +227,10 @@ and more useful:
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+MIT License. See [LICENSE](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/LICENSE).
+
+## Community And Maintenance
+
+Scientific challenges and independent replications are welcome. See
+[CONTRIBUTING.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/CONTRIBUTING.md), [GOVERNANCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/GOVERNANCE.md),
+[CODE_OF_CONDUCT.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/CODE_OF_CONDUCT.md), and [SECURITY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SECURITY.md).

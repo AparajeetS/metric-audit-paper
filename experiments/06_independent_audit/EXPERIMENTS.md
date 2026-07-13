@@ -16,7 +16,7 @@ Why it matters:
 - this tests the paper narrative against the saved evidence, not against memory or manuscript prose
 - it is robust to script drift as long as the CSV is intact
 
-Implemented in [artifact_audit.py](C:/Research/cei/metric-audit-paper-code/experiments/06_independent_audit/artifact_audit.py).
+Implemented in [`artifact_audit.py`](artifact_audit.py).
 
 ## Experiment 2: Temporal Checkpoint Audit
 
@@ -46,11 +46,10 @@ Why it matters:
 Run:
 
 ```powershell
-& 'C:\Users\apara\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' `
-  'C:\Research\cei\metric-audit-paper-code\experiments\06_independent_audit\artifact_audit.py'
+python experiments\06_independent_audit\artifact_audit.py
 ```
 
 This writes:
 
-- [artifact_audit_report.md](C:/Research/cei/metric-audit-paper-code/experiments/06_independent_audit/artifact_audit_report.md)
-- [artifact_audit_report.json](C:/Research/cei/metric-audit-paper-code/experiments/06_independent_audit/artifact_audit_report.json)
+- [artifact_audit_report.md](artifact_audit_report.md)
+- [artifact_audit_report.json](artifact_audit_report.json)
