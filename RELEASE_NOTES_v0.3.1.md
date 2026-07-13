@@ -1,20 +1,38 @@
 # mbe-eval v0.3.1
 
-This maintenance release aligns the Python package with the renamed public
-repository and clarifies the boundary between the stable MBE v1 audit and the
-MBE 2.0 research program.
+PyPI: https://pypi.org/project/mbe-eval/0.3.1/
 
-## Changes
+This release aligns the installable package and its PyPI page with the current
+public research position.
 
-- update all package, citation, documentation, and issue URLs to
-  `AparajeetS/marginal-baseline-eval`;
-- expose `mbe_eval.__version__` and `--version` in both command-line tools;
-- add continuous integration across Python 3.9, 3.11, 3.13, and 3.14;
-- add package build and metadata validation in CI;
-- add explicit open-research, governance, security, and evidence-status docs;
-- clarify that the 680-row v1 ledger is exploratory legacy evidence;
-- publish the MBE 2.0 technical program and gated JMLR roadmap.
+## Scientific Positioning
 
-## Compatibility
+- Labels the 680-row v1 ledger as exploratory rather than confirmatory.
+- Records the repeated-configuration problem and invalid legacy text setup.
+- Replaces universal metric-failure language with scoped, protocol-sensitive
+  conclusions.
+- Distinguishes the stable v1 linear partial-rank implementation from the MBE
+  2.0 research design, which is not yet fully implemented or validated.
+- States the novelty boundary: MBE does not claim priority for partial
+  correlation or hyperparameter conditioning individually.
 
-There are no API-breaking changes from v0.3.0.
+## Project Metadata
+
+- Updates the author email and all project links.
+- Points installation, source, issue, documentation, evidence, and notebook
+  links to the renamed `marginal-baseline-eval` project.
+- Keeps the lightweight core dependency set and optional PyTorch extras.
+
+## Grant-Readiness Documentation
+
+- Adds an exact 340-run factorial matrix: 240 image and 100 causal-text runs.
+- Adds a protected-holdout and independent-replication protocol.
+- Adds gated budget ceilings, public deliverables, and a final spend ledger.
+
+## Validation
+
+```bash
+python -m pytest -q
+python -m build
+python -m twine check dist/*
+```

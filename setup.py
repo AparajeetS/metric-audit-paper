@@ -19,6 +19,8 @@ setup(
         "Issues": "https://github.com/AparajeetS/marginal-baseline-eval/issues",
         "Documentation": "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/README.md",
         "Evidence": "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SUPPORTING_EVIDENCE.md",
+        "Research Program": "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_2_RESEARCH_PROGRAM.md",
+        "Replication Protocol": "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/INDEPENDENT_REPLICATION_PROTOCOL.md",
         "Kaggle Notebook": "https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe",
     },
     packages=find_packages(exclude=["experiments*", "examples*", "docs*", "tests*"]),

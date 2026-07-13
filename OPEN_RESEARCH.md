@@ -19,6 +19,8 @@ the available analyses, and propose competing designs.
 | Reproduction guide | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | CPU and GPU paths separated |
 | Milestone roadmap | [`docs/JMLR_MILESTONE_ROADMAP.md`](docs/JMLR_MILESTONE_ROADMAP.md) | Gated plan to submission-grade evidence |
 | Compute budget | [`docs/COMPUTE_AND_COST_PLAN.md`](docs/COMPUTE_AND_COST_PLAN.md) | Minimum and recommended estimates |
+| Grant execution plan | [`GRANT_EXECUTION_PLAN.md`](GRANT_EXECUTION_PLAN.md) | Exact run matrix, holdout, budget ceilings, and deliverables |
+| Independent replication | [`docs/INDEPENDENT_REPLICATION_PROTOCOL.md`](docs/INDEPENDENT_REPLICATION_PROTOCOL.md) | Conflict, execution, acceptance, and reporting rules |
 | Citation metadata | [`CITATION.cff`](CITATION.cff) | Machine-readable citation |
 
 ## What Works Without New Compute

@@ -32,6 +32,13 @@ transport, intervention response, and measurement reliability. The technical
 [research program](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_2_RESEARCH_PROGRAM.md), gated [JMLR roadmap](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/JMLR_MILESTONE_ROADMAP.md),
 and [compute plan](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/COMPUTE_AND_COST_PLAN.md) are the source of truth for new work.
 
+MBE does not claim that partial correlation or hyperparameter conditioning is
+new. The proposed contribution is their calibrated integration with a baseline
+information ladder, five explicit estimands, deliberately deceptive controls,
+configuration-blocked uncertainty, environment transport, matched
+interventions, measurement reliability, and scoped metric claim cards. This
+novelty claim must pass the public-corpus comparison gate or be narrowed.
+
 - Package: [`mbe-eval`](https://pypi.org/project/mbe-eval/)
 - Public notebook: [Audit ML Training Metrics with MBE](https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe)
 - Documentation map: [docs/README.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/README.md)
@@ -46,6 +53,8 @@ and [compute plan](https://github.com/AparajeetS/marginal-baseline-eval/blob/mas
 - Paper notes: [PAPER.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PAPER.md) and [PUBLICATION_STRATEGY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PUBLICATION_STRATEGY.md)
 - Contribution guide: [CONTRIBUTING.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/CONTRIBUTING.md)
 - Open research inventory: [OPEN_RESEARCH.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/OPEN_RESEARCH.md)
+- Grant execution plan: [GRANT_EXECUTION_PLAN.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/GRANT_EXECUTION_PLAN.md)
+- Independent replication protocol: [docs/INDEPENDENT_REPLICATION_PROTOCOL.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/INDEPENDENT_REPLICATION_PROTOCOL.md)
 - Governance: [GOVERNANCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/GOVERNANCE.md)
 - Roadmap: [ROADMAP.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/ROADMAP.md)
 
@@ -55,6 +64,13 @@ The existing **680-row pilot ledger** is exploratory evidence, not a
 submission-grade independent model sample. It includes repeated configurations,
 and the text experiment lacks a causal attention mask and permits label leakage.
 Its results motivate the new protocol but must not support confirmatory claims.
+
+The minimum corrected scale design is explicit: 240 image runs
+(`2 datasets x 3 architectures x 8 configurations x 5 seeds`) plus 100
+causally masked text runs
+(`1 dataset x 2 model sizes x 10 configurations x 5 seeds`). The 340 total is
+a blocked factorial design, not a claim of 340 independent observations. See
+[GRANT_EXECUTION_PLAN.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/GRANT_EXECUTION_PLAN.md).
 
 The ledger contains:
 

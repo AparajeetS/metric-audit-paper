@@ -29,13 +29,36 @@ for making those dependencies explicit.
 
 ### Primary contribution
 
-A unified empirical protocol that separates four questions commonly collapsed
+A unified empirical protocol that separates five questions commonly collapsed
 into one correlation coefficient:
 
 1. unconditional predictive association;
 2. incremental predictive utility beyond available baselines;
 3. transport to unseen environments;
-4. consistency under controlled interventions.
+4. consistency under controlled interventions;
+5. measurement reliability and operational cost.
+
+### Novelty boundary
+
+MBE does not claim priority for conditioning on hyperparameters, partial
+correlation, cross-fitting, or environment holdout evaluation individually.
+Its proposed contribution is the auditable combination of:
+
+- an explicit ladder of information available before training, during
+  training, and on an independent validation set;
+- five separate estimands for association, incremental utility, transport,
+  intervention consistency, and measurement reliability;
+- synthetic negative, positive, oracle, and deliberately deceptive controls
+  that calibrate the audit before real metric families are ranked;
+- configuration-blocked uncertainty and environment-level transport tests;
+- a scoped metric claim card that records what target a metric predicts,
+  beyond which baseline, in which environments, at what cost.
+
+This is a provisional methodological contribution. Gate WP2 must show that the
+combined protocol reveals a stable, interpretable distinction not already
+provided by prior conditional or robust evaluation methods. If it does not,
+the project will publish the benchmark and narrow or withdraw the novelty
+claim.
 
 ### Secondary contribution
 

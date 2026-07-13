@@ -7,6 +7,8 @@ Use this page as the map for the research repository.
 - [MBE 2.0 research program](MBE_2_RESEARCH_PROGRAM.md): current technical source of truth.
 - [JMLR milestone roadmap](JMLR_MILESTONE_ROADMAP.md): gated path from protocol freeze to submission.
 - [Compute and cost plan](COMPUTE_AND_COST_PLAN.md): minimum and recommended resource budgets.
+- [Independent replication protocol](INDEPENDENT_REPLICATION_PROTOCOL.md): external execution, conflict, acceptance, and reporting rules.
+- [Grant execution plan](../GRANT_EXECUTION_PLAN.md): exact 340-run matrix, budget ceilings, holdout, and public deliverables.
 - [Open research inventory](../OPEN_RESEARCH.md): public infrastructure and maturity map.
 - [Project brief](../PROJECT_BRIEF.md): short grant-facing summary.
 - [README](../README.md): install, package usage, and current result snapshot.

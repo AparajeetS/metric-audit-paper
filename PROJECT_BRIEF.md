@@ -39,6 +39,14 @@ cross-fitted nonlinear baselines, separate targets, environment transport,
 intervention tests, uncertainty, practical significance, and explicit positive
 and negative controls.
 
+It does not claim priority for conditioning or partial correlation by
+themselves. The proposed contribution is a calibrated, auditable combination
+of five estimands, a baseline information ladder, deceptive controls,
+configuration-blocked uncertainty, environment transport, matched
+interventions, measurement reliability, and scoped claim cards. That novelty
+claim must pass comparison against prior conditional and robust evaluation
+methods before the main compute block is released.
+
 ## Open Research Outputs
 
 - Python package: https://pypi.org/project/mbe-eval/
@@ -49,6 +57,8 @@ and negative controls.
 - Evidence ledger: [`SUPPORTING_EVIDENCE.md`](SUPPORTING_EVIDENCE.md)
 - Reproduction guide: [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md)
 - Governance: [`GOVERNANCE.md`](GOVERNANCE.md)
+- Grant execution plan: [`GRANT_EXECUTION_PLAN.md`](GRANT_EXECUTION_PLAN.md)
+- Independent replication protocol: [`docs/INDEPENDENT_REPLICATION_PROTOCOL.md`](docs/INDEPENDENT_REPLICATION_PROTOCOL.md)
 - MIT license: [`LICENSE`](LICENSE)
 
 ## Why Support Is Needed
@@ -61,6 +71,14 @@ replication, not simply a larger rerun. Funding or credits would support:
 - corrected image and causally masked language-model factorial experiments;
 - grouped uncertainty, baseline ablations, and locked external holdouts;
 - release-quality artifacts, documentation, and independent reproduction.
+
+The minimum corrected factorial contains 340 training runs: 240 image runs
+from `2 datasets x 3 architectures x 8 configurations x 5 seeds`, plus 100
+causally masked language-model runs from
+`1 dataset x 2 model sizes x 10 configurations x 5 seeds`. These are 68
+configuration blocks with repeated seeds, not 340 IID observations. A
+corrected pilot must confirm runtime, leakage checks, and uncertainty adequacy
+before scale compute is approved.
 
 The minimum serious program is estimated at approximately 400 RTX
 4090-equivalent GPU-hours and $300-$500 in total cloud costs. The recommended
