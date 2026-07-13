@@ -1,0 +1,29 @@
+# mbe-eval v0.3.2
+
+PyPI: https://pypi.org/project/mbe-eval/0.3.2/
+
+This release is the grant-readiness and public-consistency release for MBE.
+
+## Highlights
+
+- states the novelty boundary without claiming priority for partial
+  correlation or hyperparameter conditioning;
+- publishes the exact minimum matrix of 240 image and 100 causally masked text
+  runs as 68 configuration blocks with five seeds each;
+- adds the protected-holdout, independent-replication, conflict, discrepancy,
+  and public-spend rules;
+- keeps the 680-row legacy pilot explicitly exploratory and records its
+  repeated configurations and invalid text setup;
+- aligns the package description, repository links, author metadata, release
+  tag, wheel, and source archive with the same restrained scientific position.
+
+There are no API-breaking changes from v0.3.1.
+
+## Validation
+
+```bash
+python -m pytest -q
+python -m build
+python -m twine check dist/*
+mbe-eval-demo --bootstrap 20 --no-output
+```

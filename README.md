@@ -21,7 +21,7 @@ rank-correlation.
 This is an active research direction with an accompanying Python package,
 Kaggle-scale experiment artifacts, and a public walkthrough notebook.
 
-**Software status:** `mbe-eval` v0.3.1 implements the stable MBE v1
+**Software status:** `mbe-eval` v0.3.2 implements the stable MBE v1
 partial-rank audit. MBE 2.0 is the active research design and is not yet fully
 implemented or empirically validated. See the [open research inventory](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/OPEN_RESEARCH.md)
 for a precise map of what is available now.

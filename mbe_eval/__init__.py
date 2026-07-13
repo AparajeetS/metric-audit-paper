@@ -9,7 +9,7 @@ from .core import (
 )
 from .reporting import audit_report_markdown, summarize_audit, write_markdown_report
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 __all__ = [
     "__version__",
