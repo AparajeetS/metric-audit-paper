@@ -47,7 +47,7 @@ This is simple, computable, and interpretable as concentration/spread of per-sam
 
 Pass.
 
-From `C:\Research\cei\cei_v2\fim_norm_summary.txt`:
+Legacy source artifact: `fim_norm_summary.txt`.
 
 | Probe | Expected behavior | Observed rho | p-value |
 |---|---|---:|---:|
@@ -60,14 +60,14 @@ This is a strong normal-evaluation result. The sign is consistent across two ort
 
 Mostly pass.
 
-From `C:\Research\cei\cei_v2\fim_cnn_summary.txt`:
+Legacy source artifact: `fim_cnn_summary.txt`.
 
 | Architecture | Probe | rho | p-value | Result |
 |---|---|---:|---:|---|
 | CNN + BatchNorm | noise | -0.956 | 1.20e-06 | pass |
 | CNN + BatchNorm | n_train | -0.837 | 6.93e-04 | pass |
 
-From `C:\Research\cei\cei_v2\fim_transformer_summary.txt`:
+Legacy source artifact: `fim_transformer_summary.txt`.
 
 | Architecture | Probe | rho | p-value | Result |
 |---|---|---:|---:|---|
@@ -82,7 +82,7 @@ Normal read:
 
 Pass with caveat.
 
-From `C:\Research\cei\cei_v2\fim_baselines_summary.txt`:
+Legacy source artifact: `fim_baselines_summary.txt`.
 
 | Metric | noise rho | n_train rho | Consistent | Both significant |
 |---|---:|---:|---|---|
@@ -105,7 +105,7 @@ This also foreshadows the MBE failure. Several related magnitude metrics pass th
 
 Pass.
 
-From `C:\Research\cei\cei_v2\fim_bootstrap_ci.txt`:
+Legacy source artifact: `fim_bootstrap_ci.txt`.
 
 | Experiment | rho | 95 percent CI |
 |---|---:|---|
@@ -122,7 +122,7 @@ Several confidence intervals exclude zero, so the raw signal is not just a point
 
 Pass, and this is where the paper becomes interesting.
 
-From `C:\Research\cei\cei_v2\fim_review_followup.txt`:
+Legacy source artifact: `fim_review_followup.txt`.
 
 | Probe | Raw FIM vs accuracy | Loss vs accuracy | FIM vs accuracy controlling loss |
 |---|---:|---:|---:|

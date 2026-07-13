@@ -2,6 +2,12 @@
 
 Date: 2026-06-28
 
+> **Historical record:** This log predates the v1 evidence audit. Its
+> “confirmed” labels describe run completion, not submission-grade scientific
+> confirmation. The 680-row pool contains repeated configurations, and its
+> legacy text setup lacks a causal attention mask and permits label leakage.
+> See `README.md` and `docs/MBE_2_RESEARCH_PROGRAM.md` for the current protocol.
+
 This log records the state of the current large-scale MBE run sequence.
 
 ## 1. Package and Code State

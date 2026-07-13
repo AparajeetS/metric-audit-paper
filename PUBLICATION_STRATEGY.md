@@ -33,9 +33,12 @@ This narrative survives the current artifact state:
 
 ## Current Evidence Map
 
-### 680-Model Large-Scale Evidence
+### Legacy 680-Row Pilot Evidence
 
-The current backbone is the confirmed 680-model audit:
+The existing 680-row audit is an exploratory pilot and protocol-development
+artifact, not the confirmatory backbone of the paper. It contains repeated
+configurations, and the character-transformer text setup lacks a causal mask
+and permits label leakage:
 
 - 480 CIFAR-10 image models across CNN, ResNet, ViT, and WideResNet.
 - 200 character-transformer language models.
@@ -156,12 +159,13 @@ What reviewers get:
 
 1. Motivation: metric papers often overclaim from raw correlations.
 2. MBE protocol: define the audit and the causal intuition.
-3. Main evidence: 680-model audit across image and text.
-4. Case study: FIM_norm survives, washes out, or reverses depending on task/pooling.
-5. Metric taxonomy: which families survive, wash out, invert, or appear after control.
-6. Controls: negative and positive controls calibrate the audit.
-7. Robustness: strict validation-loss controls, within-suite analysis, bootstrap CIs.
-8. Discussion: MBE as a reporting standard for future metric papers.
+3. Exploratory motivation: lessons and failure modes from the legacy 680-row pilot.
+4. Main evidence: corrected blocked image and causal-text factorials plus a protected holdout.
+5. Case study: FIM_norm survives, washes out, or reverses depending on task/pooling.
+6. Metric taxonomy: which families survive, wash out, invert, or appear after control.
+7. Controls: negative and positive controls calibrate the audit.
+8. Robustness: strict validation-loss controls, within-suite analysis, bootstrap CIs.
+9. Discussion: MBE as a reporting standard for future metric papers.
 
 ## Working Title Options
 

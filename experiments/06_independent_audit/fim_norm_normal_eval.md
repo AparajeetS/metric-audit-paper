@@ -11,7 +11,7 @@ The answer is useful for the paper narrative: `FIM_norm` looked good enough that
 
 ### Dual Acid Test
 
-From `C:\Research\cei\cei_v2\fim_norm_summary.txt`:
+Legacy source artifact: `fim_norm_summary.txt`.
 
 | Probe | Raw Spearman rho | p-value | Direction |
 |---|---:|---:|---|
@@ -44,14 +44,14 @@ This is visually and statistically compelling: `FIM_norm` behaves monotonically 
 
 ### Cross-Architecture Harness
 
-From `C:\Research\cei\cei_v2\fim_cnn_summary.txt`:
+Legacy source artifact: `fim_cnn_summary.txt`.
 
 | Architecture | Probe | rho | p-value | Verdict |
 |---|---|---:|---:|---|
 | CNN + BatchNorm | noise | -0.956 | 1.20e-06 | pass |
 | CNN + BatchNorm | n_train | -0.837 | 6.93e-04 | pass |
 
-From `C:\Research\cei\cei_v2\fim_transformer_summary.txt`:
+Legacy source artifact: `fim_transformer_summary.txt`.
 
 | Architecture | Probe | rho | p-value | Verdict |
 |---|---|---:|---:|---|
@@ -66,7 +66,7 @@ That is a serious positive story before MBE.
 
 ### Baseline Metric Comparison
 
-From `C:\Research\cei\cei_v2\fim_baselines_summary.txt`:
+Legacy source artifact: `fim_baselines_summary.txt`.
 
 | Metric | noise rho | n_train rho | Consistent | Both significant |
 |---|---:|---:|---|---|
@@ -85,7 +85,7 @@ This matters because the later MBE story should not pretend `FIM_norm` was weak.
 
 ### Bootstrap Checks
 
-From `C:\Research\cei\cei_v2\fim_bootstrap_ci.txt`:
+Legacy source artifact: `fim_bootstrap_ci.txt`.
 
 | Experiment | rho | 95% CI |
 |---|---:|---|

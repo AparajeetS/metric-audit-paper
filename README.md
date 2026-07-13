@@ -84,7 +84,7 @@ The ledger contains:
 
 The current Kaggle-scale runs support a selective audit story:
 
-- MBE does **not** destroy every metric.
+- MBE is selective rather than indiscriminate; many metrics retain signal under the declared controls.
 - Several validation, confidence/logit, gradient/Fisher magnitude, and
   task-proximal metrics survive.
 - Several feature-rank, weight-norm, distance/update, and sharpness/noise-scale

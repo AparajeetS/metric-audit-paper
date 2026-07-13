@@ -69,7 +69,7 @@ The frozen result is retained regardless of direction.
 | Budget line | Ceiling | Release condition |
 |---|---:|---|
 | Research engineering and execution | $12,000 | Paid against frozen-protocol, implementation, analysis, documentation, and release milestones |
-| Cloud compute and storage | $5,000 | Released in gates; current recommended plan is about 650 RTX 4090-equivalent hours with a $600-$900 direct-compute estimate, leaving room for holdout, reruns, independent execution, storage, and provider variance |
+| Cloud compute and storage | $5,000 | Gated ceiling for primary runs, protected holdout, approved reruns, independent execution, storage, artifact transfer, archival preparation, and provider variance |
 | Independent replication and audit | $5,000 | Released under the published independence and conflict rules |
 | Open benchmark and archival release | $2,000 | Dataset packaging, checksums, metadata, persistent hosting, and citable archive |
 | Contingency | $1,000 | Failed jobs or approved variance; unused balance remains visible |

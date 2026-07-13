@@ -80,10 +80,12 @@ configuration blocks with repeated seeds, not 340 IID observations. A
 corrected pilot must confirm runtime, leakage checks, and uncertainty adequacy
 before scale compute is approved.
 
-The minimum serious program is estimated at approximately 400 RTX
-4090-equivalent GPU-hours and $300-$500 in total cloud costs. The recommended
-program is approximately 650 equivalent hours with a $600-$900 cap. Compute is
-released only after no-compute and pilot gates pass.
+The minimum operational target is approximately 400 RTX 4090-equivalent
+GPU-hours. The recommended envelope is approximately 650 equivalent hours when
+the public-corpus and pilot gates support proceeding. The grant compute-and-
+storage allocation is a gated ceiling covering primary execution, holdout,
+approved reruns, independent execution, storage, transfer, and provider
+variance; it is not a raw GPU-rental quote or spending target.
 
 ## Expected Impact
 

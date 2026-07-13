@@ -37,7 +37,7 @@ These are conventional metric-evaluation checks, not MBE checks.
 
 | Run / evidence | Main result | What it suggests | Washout metrics |
 |---|---|---|---|
-| MLP dual acid test | Label-noise probe: FIM_norm vs accuracy `rho=-0.770`, `p=3.41e-03`; data-capacity probe: `rho=-0.937`, `p=6.99e-06` | FIM_norm looked strong under normal metric validation; lower FIM_norm tracked better generalization across two controlled stress directions. | Not applicable: no MBE controls in this run |
+| MLP dual acid test | Label-noise probe: FIM_norm vs accuracy `rho=-0.770`, `p=3.41e-03`; data-capacity probe: `rho=-0.937`, `p=6.99e-06` | FIM_norm showed strong associations under conventional metric validation; lower FIM_norm tracked better generalization across two controlled stress directions. | Not applicable: no MBE controls in this run |
 | Condition means | FIM_norm increased monotonically with label noise and decreased with more training data, while accuracy moved in the expected opposite direction | The metric had visually clean and statistically plausible behavior before MBE. | Not applicable |
 | CNN + BatchNorm transfer | Noise probe `rho=-0.956`, n-train probe `rho=-0.837` | FIM_norm transferred beyond MLPs and survived BatchNorm settings under ordinary evaluation. | Not applicable |
 | Transformer + LayerNorm transfer | Noise probe had correct sign but was not significant; n-train probe `rho=-0.951` | FIM_norm had partial architecture-transfer evidence, with weaker noise evidence on transformer. | Not applicable |
@@ -46,11 +46,11 @@ These are conventional metric-evaluation checks, not MBE checks.
 
 Interpretation:
 
-FIM_norm passed enough conventional checks to motivate a metric paper. That is
-why it is useful as a case study: MBE did not break a straw metric; it broke a
-metric that looked credible under normal validation.
+FIM_norm passed enough conventional checks to motivate further investigation.
+That makes it a useful case study: MBE stress-tests a metric that appeared
+credible under conventional validation rather than an intentionally weak one.
 
-## 2. Early Loss-Controlled Falsification
+## 2. Early Loss-Controlled Stress Test
 
 Source:
 
@@ -195,8 +195,8 @@ baseline controls.
 
 ## 7. Metrics That Repeatedly Survive
 
-The full confirmed 680-model strict audit is the best current test of whether
-MBE is selective. In that run, many metrics survived despite strong controls:
+The legacy 680-row strict pilot is exploratory evidence that MBE can behave
+selectively. In that run, many metrics survived despite strong controls:
 
 - fisher_trace
 - fisher_spectral
@@ -227,16 +227,16 @@ MBE is selective. In that run, many metrics survived despite strong controls:
 
 Interpretation:
 
-This is important for the paper. MBE is not an indiscriminate metric destroyer.
+This is important for the paper. MBE does not uniformly suppress metric signal.
 It can preserve strong signals while flagging fragile ones.
 
 ## 8. Overall Narrative Supported So Far
 
 The evidence supports this narrative:
 
-1. FIM_norm looked publishable under ordinary metric evaluation.
-2. Loss-controlled and hyperparameter-controlled audits broke much of its
-   apparent independent signal.
+1. FIM_norm met several conventional metric-validation checks.
+2. Loss-controlled and hyperparameter-controlled audits substantially weakened
+   its apparent independent signal.
 3. Larger Kaggle-scale audits show that FIM_norm behavior is task-dependent:
    image-only results can survive, text-only results can wash out, and pooled
    image+text results can reverse.
