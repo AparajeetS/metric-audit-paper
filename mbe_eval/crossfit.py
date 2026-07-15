@@ -63,6 +63,31 @@ def _design_train_test(
     return np.column_stack(train_blocks), np.column_stack(test_blocks)
 
 
+def _rank_train_test(
+    train: pd.Series,
+    test: pd.Series,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Map train and test values through the training-fold empirical CDF.
+
+    Ties receive their mid-distribution value. Test values that were not seen in
+    training receive their insertion percentile. Keeping the transform inside
+    each fold prevents held-out outcomes or scores from influencing their own
+    representation.
+    """
+
+    train_values = train.to_numpy(dtype=float)
+    test_values = test.to_numpy(dtype=float)
+    sorted_train = np.sort(train_values)
+    denominator = float(len(sorted_train))
+
+    def transform(values: np.ndarray) -> np.ndarray:
+        left = np.searchsorted(sorted_train, values, side="left")
+        right = np.searchsorted(sorted_train, values, side="right")
+        return (left + right).astype(float) / (2.0 * denominator)
+
+    return transform(train_values), transform(test_values)
+
+
 def _fold_ids(
     df: pd.DataFrame,
     n_splits: int,
@@ -185,8 +210,8 @@ def cross_fitted_audit(
         raise ValueError("cross-fitted audit requires at least 20 complete rows")
 
     fold_ids = _fold_ids(clean, n_splits, seed, group_col)
-    target_rank = clean[target].rank(method="average", pct=True).to_numpy(dtype=float)
-    metric_rank = clean[metric].rank(method="average", pct=True).to_numpy(dtype=float)
+    target_rank = np.full(len(clean), np.nan, dtype=float)
+    metric_rank = np.full(len(clean), np.nan, dtype=float)
     target_pred = np.full(len(clean), np.nan, dtype=float)
     metric_pred = np.full(len(clean), np.nan, dtype=float)
     augmented_pred = np.full(len(clean), np.nan, dtype=float)
@@ -196,18 +221,26 @@ def cross_fitted_audit(
         train_idx = np.flatnonzero(fold_ids != fold)
         train = clean.iloc[train_idx]
         test = clean.iloc[test_idx]
+        target_train_rank, target_test_rank = _rank_train_test(
+            train[target], test[target]
+        )
+        metric_train_rank, metric_test_rank = _rank_train_test(
+            train[metric], test[metric]
+        )
+        target_rank[test_idx] = target_test_rank
+        metric_rank[test_idx] = metric_test_rank
         x_train, x_test = _design_train_test(train, test, controls, degree)
         metric_train_blocks, metric_test_blocks = _numeric_block(
-            pd.Series(metric_rank[train_idx]),
-            pd.Series(metric_rank[test_idx]),
+            pd.Series(metric_train_rank),
+            pd.Series(metric_test_rank),
             degree,
         )
         x_aug_train = np.column_stack([x_train, *metric_train_blocks])
         x_aug_test = np.column_stack([x_test, *metric_test_blocks])
 
-        target_beta = _ridge_fit(x_train, target_rank[train_idx], ridge)
-        metric_beta = _ridge_fit(x_train, metric_rank[train_idx], ridge)
-        augmented_beta = _ridge_fit(x_aug_train, target_rank[train_idx], ridge)
+        target_beta = _ridge_fit(x_train, target_train_rank, ridge)
+        metric_beta = _ridge_fit(x_train, metric_train_rank, ridge)
+        augmented_beta = _ridge_fit(x_aug_train, target_train_rank, ridge)
         target_pred[test_idx] = x_test @ target_beta
         metric_pred[test_idx] = x_test @ metric_beta
         augmented_pred[test_idx] = x_aug_test @ augmented_beta

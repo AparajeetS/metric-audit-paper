@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from mbe_eval.crossfit import cross_fitted_audit
+from mbe_eval.crossfit import _rank_train_test, cross_fitted_audit
 
 
 def _synthetic_runs(seed: int = 4, n: int = 360) -> pd.DataFrame:
@@ -99,3 +99,13 @@ def test_cross_fitting_rejects_too_few_complete_rows():
             "target",
             ["capability"],
         )
+
+
+def test_rank_transform_is_fitted_only_on_training_fold():
+    train_rank, test_rank = _rank_train_test(
+        pd.Series([0.0, 0.0, 2.0, 4.0]),
+        pd.Series([-10.0, 0.0, 1.0, 10.0]),
+    )
+
+    assert train_rank.tolist() == pytest.approx([0.25, 0.25, 0.625, 0.875])
+    assert test_rank.tolist() == pytest.approx([0.0, 0.25, 0.5, 1.0])
