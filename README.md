@@ -32,6 +32,39 @@ transport, intervention response, and measurement reliability. The technical
 [research program](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_2_RESEARCH_PROGRAM.md), gated [JMLR roadmap](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/JMLR_MILESTONE_ROADMAP.md),
 and [compute plan](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/COMPUTE_AND_COST_PLAN.md) are the source of truth for new work.
 
+### Experimental Benchmark Audit Prototype
+
+The repository now includes an experimental prototype for testing whether
+selected E0-E2 checks from the candidate MBE 2.0 design transfer to AI
+benchmark audits. It accepts a candidate metric, an external target, declared
+baseline or capability-proxy columns, an environment, and a configuration-unit
+identifier, then produces a scoped claim card. E3 matched interventions and E4
+measurement-reliability checks are explicitly omitted.
+
+```bash
+mbe-eval-claim --csv benchmark_results.csv \
+  --metric truthfulness_score --target external_criterion \
+  --baselines capability_proxy,format_score \
+  --environment benchmark_family --unit config_unit \
+  --claim-text "The score adds held-out information beyond the declared proxies" \
+  --output-prefix claim_card
+```
+
+Run the included deterministic deceptive-control self-check with:
+
+```bash
+mbe-eval-claim-demo
+```
+
+This is a working research prototype, not an independently validated evaluator.
+It does not certify benchmarks or models, establish causality or construct
+validity, or show that declared capability proxies exhaust general capability.
+The deceptive synthetic control checks expected behavior under one known trap;
+passing it is not external validation. Stable `mbe-eval` v0.3.2 and the exploratory
+680-row legacy ledger establish feasibility only; the ledger contains repeated
+configurations and a legacy text setup with label leakage. See the full
+[scope, input contract, conformance table, and claim limits](docs/BENCHMARK_AUDIT_PROTOTYPE.md).
+
 MBE does not claim that partial correlation or hyperparameter conditioning is
 new. The proposed contribution is their calibrated integration with a baseline
 information ladder, five explicit estimands, deliberately deceptive controls,

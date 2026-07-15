@@ -16,7 +16,7 @@ from mbe_eval import (
 
 
 def test_public_version_matches_release():
-    assert __version__ == "0.3.2"
+    assert __version__ == "0.4.0.dev0"
 
 
 def synthetic_frame(seed=0, n=300):

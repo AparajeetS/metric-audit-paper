@@ -27,6 +27,8 @@ jobs:
       - run: python -m pytest -q
       - run: mbe-eval-audit --version
       - run: mbe-eval-demo --version
+      - run: mbe-eval-claim --version
+      - run: mbe-eval-claim-demo --version
 
   package:
     runs-on: ubuntu-latest

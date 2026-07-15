@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as handle:
 
 setup(
     name="mbe-eval",
-    version="0.3.2",
+    version="0.4.0.dev0",
     author="Aparajeet Shadangi",
     author_email="aparajeet.shadangi@proton.me",
     description="Marginal Baseline Evaluation for auditing machine-learning training metrics.",
@@ -64,6 +64,8 @@ setup(
         "console_scripts": [
             "mbe-eval-audit=mbe_eval.cli:main",
             "mbe-eval-demo=mbe_eval.demo:main",
+            "mbe-eval-claim=mbe_eval.claim_cli:main",
+            "mbe-eval-claim-demo=mbe_eval.claim_demo:main",
         ]
     },
 )
