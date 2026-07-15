@@ -397,7 +397,7 @@ def audit_benchmark_claim(
             "declarations": {
                 "metric": metric,
                 "target": target,
-                "declared_baselines_or_capability_proxies": baseline_list,
+                "declared_baselines_or_proxies": baseline_list,
                 "environment": environment,
                 "independence_unit": unit,
                 "minimum_relative_mse_improvement": min_increment,
@@ -433,8 +433,8 @@ def audit_benchmark_claim(
             "limitations": [
                 "Results are conditional on the named outcome, data, split, estimator, "
                 "declared baselines, environments, and analysis settings.",
-                "Declared capability proxies do not exhaust latent model capability or "
-                "all possible confounding.",
+                "Declared baselines and proxies do not exhaust latent capability, "
+                "response style, task structure, or all possible confounding.",
                 "Empirical rank transforms and numeric scaling are fitted within each "
                 "training fold; results remain conditional on the chosen folds and "
                 "finite-sample transformations.",
@@ -505,10 +505,10 @@ def claim_card_markdown(card: Mapping[str, object]) -> str:
         f"- Text: {claim['text'] or '(not supplied)'}",
         f"- Candidate score: `{declarations['metric']}`",
         f"- Named outcome: `{declarations['target']}`",
-        "- Declared baselines or capability proxies: "
+        "- Declared baselines or proxies: "
         + ", ".join(
             f"`{name}`"
-            for name in declarations["declared_baselines_or_capability_proxies"]
+            for name in declarations["declared_baselines_or_proxies"]
         ),
         f"- Environment: `{declarations['environment']}`",
         f"- Independence unit: `{declarations['independence_unit']}`",

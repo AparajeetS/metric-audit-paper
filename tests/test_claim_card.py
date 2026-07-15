@@ -41,6 +41,8 @@ def test_claim_card_separates_candidate_from_deceptive_and_negative_controls():
     assert card["independently_validated"] is False
     assert card["evidence_state"] in EVIDENCE_STATES
     assert "claim_status" not in card
+    assert "declared_baselines_or_proxies" in card["declarations"]
+    assert "declared_baselines_or_capability_proxies" not in card["declarations"]
     assert card["evidence"]["E0"]["raw_rank_correlation"] > 0.9
     assert card["evidence"]["E1"]["result"]["relative_mse_improvement"] > 0.8
     assert card["evidence"]["E2"]["result"]["relative_mse_improvement"] > 0.8

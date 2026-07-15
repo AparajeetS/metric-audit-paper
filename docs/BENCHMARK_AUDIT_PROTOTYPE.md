@@ -50,7 +50,7 @@ should be chosen before examining the final results.
 
 ### Capability proxies are declared proxies
 
-The report should say "conditional on the declared capability proxies," not
+The report should say "conditional on the declared baselines and proxies," not
 "after controlling for capability." Observed columns such as general benchmark
 performance, parameter count, or compute are incomplete proxies for latent
 capability. An apparently incremental benchmark signal may still reflect an

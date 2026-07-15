@@ -90,7 +90,7 @@ mbe-eval-claim-demo
 
 This is a working research prototype, not an independently validated evaluator.
 It does not certify benchmarks or models, establish causality or construct
-validity, or show that declared capability proxies exhaust general capability.
+validity, or show that declared baselines and proxies exhaust general capability.
 The deceptive synthetic control checks expected behavior under one known trap;
 passing it is not external validation. Stable `mbe-eval` v0.3.2 and the exploratory
 680-row legacy ledger establish feasibility only; the ledger contains repeated
