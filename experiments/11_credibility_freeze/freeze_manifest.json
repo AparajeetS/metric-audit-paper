@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-07-16T14:56:32.474253+00:00",
+  "base_commit": "5817dc47f3259f7eeb04a37266cb6ed392f57a70",
+  "freeze_name": "mbe-pgdl-development-protocol-v1",
+  "protected_tasks": [
+    "task4",
+    "task5",
+    "task6",
+    "task7",
+    "task8",
+    "task9"
+  ],
+  "files": [
+    {
+      "path": "mbe_eval/crossfit.py",
+      "bytes": 23474,
+      "sha256": "ec4c002643c9cef79a1ce8378ebca361475b9d076ee3d53c458f0b9bb04ab1b4"
+    },
+    {
+      "path": "mbe_eval/comparators.py",
+      "bytes": 8339,
+      "sha256": "1ec9286759cd7a6a74d55ad52986ae5341a6701c66ee2ca8a5167523edcfbeb7"
+    },
+    {
+      "path": "mbe_eval/diagnostics.py",
+      "bytes": 2352,
+      "sha256": "fdd896e80284ec4c080ae6889f0116d10b0dd51db12f19ab7bde48d0ed407c58"
+    },
+    {
+      "path": "mbe_eval/reaudit.py",
+      "bytes": 11310,
+      "sha256": "4e92fefec430e135f8f8445dcf34c387bb05a4dc8a0a44ea29bbdec706656e53"
+    },
+    {
+      "path": "experiments/10_method_comparison/run_factorial_benchmark.py",
+      "bytes": 10041,
+      "sha256": "c5dd970dea8e969b9ffcafe1f53c59a1666e431e879072953a6727dbf8bc4278"
+    },
+    {
+      "path": "experiments/10_method_comparison/run_refit_inference_calibration.py",
+      "bytes": 6327,
+      "sha256": "daa5a7765b2c9bf6a68e738051f1b19d727c2193a79a0556d0f4a6497bbb330e"
+    },
+    {
+      "path": "experiments/09_published_metric_reaudit/studies/pgdl2020/metric_plan.json",
+      "bytes": 4564,
+      "sha256": "9727c440718a8d7e2c50783e69827f5f8d64a45e1b46fc582ff15fa2b663c1e9"
+    },
+    {
+      "path": "experiments/09_published_metric_reaudit/studies/pgdl2020/pilot_selection.csv",
+      "bytes": 6921,
+      "sha256": "062c11be071e6ced04eb3fb36f373424c7119a27139edbab32fc2d3354c2ffff"
+    },
+    {
+      "path": "experiments/11_credibility_freeze/claim_ledger.json",
+      "bytes": 3628,
+      "sha256": "da42c8c16239e984ed9786372a359f46f3844bbab9af0336f8d0c50d4e3008f7"
+    },
+    {
+      "path": "experiments/11_credibility_freeze/PREREGISTRATION.md",
+      "bytes": 2094,
+      "sha256": "acda8bce61b364b7c20f09e5e707443046e81460df6aa5cc9677332bbe5c584a"
+    },
+    {
+      "path": "docs/CONDITIONAL_METRIC_RELIABILITY_PROTOCOL.md",
+      "bytes": 7790,
+      "sha256": "e85c22cb4aed60b2ba50f565081884aa06abfbc6d7e5f1809eedf032c127aa6b"
+    },
+    {
+      "path": "docs/MBE_CREDIBILITY_LEDGER.md",
+      "bytes": 10827,
+      "sha256": "3aef634093121331eafb646740d4f53b6fb50aeab37b97a6e3a7d6729389dc5a"
+    }
+  ]
+}
