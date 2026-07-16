@@ -10,6 +10,7 @@ its conclusions are suspected to be wrong.
 | 2 | Dziugaite et al. (2020), *In Search of Robust Measures of Generalization* | Environment interventions and robust sign-error provide a direct comparison estimand | Figure 1 source statistic and MBE reaudit complete |
 | 3 | Predicting Generalization in Deep Learning competition / PGDL corpus | Independent public environments and a benchmark-oriented evaluation design | 550-model metadata intake complete; checkpoint metric extraction frozen |
 | 4 | Jiang et al. (2019), *Predicting the Generalization Gap in Deep Networks with Margin Distributions* | Influential metric claim with a concrete intended direction | Run-level artifact availability required |
+| 5 | Kim et al. (2023), *Fantastic Robustness Measures* | Independent robust-generalization target and public model hub | Official repo inspected; paper metric ledger and analysis code unavailable |
 
 ## Acceptance Criteria
 

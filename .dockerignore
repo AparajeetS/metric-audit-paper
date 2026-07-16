@@ -1,0 +1,10 @@
+.git
+.github
+.pytest_cache
+__pycache__
+*.egg-info
+*.pyc
+.venv
+build
+dist
+experiments/07_jmlr_scale

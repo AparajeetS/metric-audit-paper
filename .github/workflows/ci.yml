@@ -39,3 +39,16 @@ jobs:
       - run: python -m pip install --upgrade pip build twine
       - run: python -m build
       - run: python -m twine check dist/*
+
+  credibility-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -e ".[dev]"
+      - run: python experiments/08_protocol_calibration/run_calibration.py --permutations 19 --output-dir /tmp/mbe_calibration_smoke
+      - run: python experiments/10_method_comparison/run_factorial_benchmark.py --repetitions 2 --seeds-per-config 3 --permutations 19 --bootstrap 19 --output-dir /tmp/mbe_method_smoke
+      - run: python experiments/11_credibility_freeze/validate_claims.py experiments/11_credibility_freeze/claim_ledger.json

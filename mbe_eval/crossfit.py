@@ -45,12 +45,9 @@ def _numeric_block(
 ) -> tuple[list[np.ndarray], list[np.ndarray]]:
     train_values = train.to_numpy(dtype=float)
     test_values = test.to_numpy(dtype=float)
-    mean = float(np.mean(train_values))
-    scale = float(np.std(train_values))
-    if not np.isfinite(scale) or scale < 1e-12:
-        scale = 1.0
-    train_z = np.clip((train_values - mean) / scale, -8.0, 8.0)
-    test_z = np.clip((test_values - mean) / scale, -8.0, 8.0)
+    train_rank, test_rank = _rank_train_test(train_values, test_values)
+    train_z = 2.0 * train_rank - 1.0
+    test_z = 2.0 * test_rank - 1.0
     return (
         [np.power(train_z, power) for power in range(1, degree + 1)],
         [np.power(test_z, power) for power in range(1, degree + 1)],
@@ -225,6 +222,7 @@ def cross_fitted_audit(
     controls: Sequence[str],
     *,
     group_col: str | None = None,
+    permutation_block_col: str | None = None,
     n_splits: int = 5,
     degree: int = 2,
     ridge: float = 1e-3,
@@ -235,9 +233,10 @@ def cross_fitted_audit(
 ) -> dict[str, float | int | str]:
     """Estimate incremental metric signal with grouped cross-fitting.
 
-    Numeric controls are expanded into a frozen polynomial basis within each
-    training fold. Categorical controls are one-hot encoded from training-fold
-    levels. The function reports out-of-fold residual dependence and the change
+    Numeric controls are mapped through a training-fold empirical CDF and
+    expanded into a bounded polynomial basis. Categorical controls are one-hot
+    encoded from training-fold levels. The function reports out-of-fold
+    residual dependence and the change
     in target mean-squared error from adding the metric to the baseline model.
 
     This is a compact reference implementation for protocol calibration. It is
@@ -262,6 +261,9 @@ def cross_fitted_audit(
     required = [metric, target, *controls]
     if group_col:
         required.append(group_col)
+    if permutation_block_col:
+        required.append(permutation_block_col)
+    required = list(dict.fromkeys(required))
     missing = [column for column in required if column not in df.columns]
     if missing:
         raise ValueError(f"missing required columns: {', '.join(missing)}")
@@ -289,7 +291,12 @@ def cross_fitted_audit(
         train_idx = np.flatnonzero(fold_ids != fold)
         train = clean.iloc[train_idx]
         test = clean.iloc[test_idx]
-        design_degree = degree if nuisance_model == "polynomial_ridge" else 1
+        design_degree = (
+            degree
+            if nuisance_model
+            in {"polynomial_ridge", "polynomial_ridge_interactions"}
+            else 1
+        )
         x_train, x_test = _design_train_test(
             train, test, controls, design_degree
         )
@@ -369,8 +376,13 @@ def cross_fitted_audit(
 
     inference_metric = metric_residual
     inference_target = target_residual
+    inference_blocks = (
+        clean[permutation_block_col].astype(str).to_numpy()
+        if permutation_block_col
+        else None
+    )
     if group_col:
-        cluster = pd.DataFrame(
+        cluster_frame = pd.DataFrame(
             {
                 "group": clean[group_col].astype(str).to_numpy(),
                 "metric_residual": metric_residual,
@@ -378,7 +390,18 @@ def cross_fitted_audit(
                 "baseline_squared_error": baseline_squared_error,
                 "augmented_squared_error": augmented_squared_error,
             }
-        ).groupby("group", sort=True).mean()
+        )
+        if permutation_block_col:
+            cluster_frame["block"] = clean[permutation_block_col].astype(str).to_numpy()
+            block_counts = cluster_frame.groupby("group", sort=True)["block"].nunique()
+            if (block_counts > 1).any():
+                raise ValueError(
+                    "each inference group must belong to one permutation block"
+                )
+            inference_blocks = (
+                cluster_frame.groupby("group", sort=True)["block"].first().to_numpy()
+            )
+        cluster = cluster_frame.groupby("group", sort=True).mean(numeric_only=True)
         inference_metric = cluster["metric_residual"].to_numpy(dtype=float)
         inference_target = cluster["target_residual"].to_numpy(dtype=float)
         inference_baseline_error = cluster["baseline_squared_error"].to_numpy(dtype=float)
@@ -400,7 +423,7 @@ def cross_fitted_audit(
             residual_r,
             permutations,
             rng,
-            None,
+            inference_blocks,
         )
 
     residual_ci_low = math.nan
@@ -446,6 +469,7 @@ def cross_fitted_audit(
         "target": target,
         "controls": ",".join(controls),
         "group_col": group_col or "",
+        "permutation_block_col": permutation_block_col or "",
         "n": len(clean),
         "independence_units": len(inference_metric),
         "n_splits": int(len(np.unique(fold_ids))),
@@ -499,8 +523,102 @@ def repeated_cross_fitted_audit(
     return pd.DataFrame(rows)
 
 
+def refit_bootstrap_audit(
+    df: pd.DataFrame,
+    metric: str,
+    target: str,
+    controls: Sequence[str],
+    *,
+    refit_bootstrap: int = 199,
+    permutations: int = 199,
+    group_col: str | None = None,
+    seed: int = 0,
+    **audit_kwargs: object,
+) -> dict[str, float | int | str]:
+    """Bootstrap independent units and refit the complete audit in every draw."""
+    if refit_bootstrap < 20:
+        raise ValueError("refit_bootstrap must be at least 20")
+    forbidden = {"seed", "bootstrap", "permutations", "group_col"} & audit_kwargs.keys()
+    if forbidden:
+        raise ValueError(f"pass {', '.join(sorted(forbidden))} as named arguments")
+
+    base = cross_fitted_audit(
+        df,
+        metric,
+        target,
+        controls,
+        group_col=group_col,
+        permutations=permutations,
+        bootstrap=0,
+        seed=seed,
+        **audit_kwargs,
+    )
+    rng = np.random.default_rng(seed + 3_000_003)
+    residual_draws: list[float] = []
+    delta_draws: list[float] = []
+
+    if group_col:
+        source_groups = df[group_col].dropna().astype(str).unique()
+        if len(source_groups) < 2:
+            raise ValueError("refit bootstrap requires at least two independent groups")
+    else:
+        source_groups = np.arange(len(df))
+
+    for draw in range(refit_bootstrap):
+        sampled = rng.choice(source_groups, size=len(source_groups), replace=True)
+        if group_col:
+            pieces = []
+            group_values = df[group_col].astype(str)
+            for occurrence, sampled_group in enumerate(sampled):
+                piece = df.loc[group_values == sampled_group].copy()
+                piece[group_col] = f"{sampled_group}__bootstrap_{occurrence}"
+                pieces.append(piece)
+            bootstrap_frame = pd.concat(pieces, ignore_index=True)
+        else:
+            bootstrap_frame = df.iloc[np.asarray(sampled, dtype=int)].reset_index(drop=True)
+        try:
+            result = cross_fitted_audit(
+                bootstrap_frame,
+                metric,
+                target,
+                controls,
+                group_col=group_col,
+                permutations=0,
+                bootstrap=0,
+                seed=seed + (draw + 1) * 100_003,
+                **audit_kwargs,
+            )
+        except (ValueError, np.linalg.LinAlgError):
+            continue
+        residual_draws.append(float(result["residual_r"]))
+        delta_draws.append(float(result["delta_mse"]))
+
+    minimum_success = max(20, math.ceil(refit_bootstrap * 0.8))
+    if len(delta_draws) < minimum_success:
+        raise RuntimeError(
+            f"only {len(delta_draws)} of {refit_bootstrap} refit bootstrap draws succeeded"
+        )
+    residual_ci = np.nanquantile(residual_draws, [0.025, 0.975])
+    delta_ci = np.nanquantile(delta_draws, [0.025, 0.975])
+    base.update(
+        {
+            "refit_bootstrap_draws": refit_bootstrap,
+            "refit_bootstrap_successful": len(delta_draws),
+            "refit_residual_ci_low": float(residual_ci[0]),
+            "refit_residual_ci_high": float(residual_ci[1]),
+            "refit_delta_mse_ci_low": float(delta_ci[0]),
+            "refit_delta_mse_ci_high": float(delta_ci[1]),
+            "refit_increment_classification": classify_increment_evidence(
+                float(base["residual_p"]), float(delta_ci[0])
+            ),
+        }
+    )
+    return base
+
+
 __all__ = [
     "classify_increment_evidence",
     "cross_fitted_audit",
+    "refit_bootstrap_audit",
     "repeated_cross_fitted_audit",
 ]

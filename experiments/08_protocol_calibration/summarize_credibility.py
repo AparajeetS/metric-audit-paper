@@ -18,6 +18,8 @@ def main() -> int:
     parser.add_argument("--tree-semisynthetic", type=Path)
     parser.add_argument("--interaction-semisynthetic", type=Path)
     parser.add_argument("--pgdl-metadata-floor", type=Path)
+    parser.add_argument("--method-comparison", type=Path)
+    parser.add_argument("--refit-calibration", type=Path)
     args = parser.parse_args()
 
     monte_carlo = pd.read_csv(args.calibration_dir / "monte_carlo_summary.csv")
@@ -104,9 +106,40 @@ def main() -> int:
             f"The PGDL metadata floor contains {len(metadata)} frozen task-by-nuisance fits. Final training loss is increment-supported in {supported}; {residual_only} fits show residual dependence without interval-supported predictive improvement. This is a baseline diagnostic only and does not evaluate the checkpoint-derived metric battery.",
         ]
 
+    comparison_lines = []
+    if args.method_comparison and args.method_comparison.is_file():
+        comparison = pd.read_csv(args.method_comparison).set_index("scenario")
+        proxy_rate = comparison.loc[
+            ["design_proxy", "interaction_proxy"],
+            "mbe_interaction_support_rate",
+        ].max()
+        stable_power = comparison.loc[
+            "genuine_increment", "mbe_interaction_support_rate"
+        ]
+        comparison_lines = [
+            "",
+            "## Shared Comparator Benchmark",
+            "",
+            f"Across 50 balanced-factorial repetitions, corrected interaction MBE supported known design/interaction proxies in at most {proxy_rate:.1%} of repetitions and recovered the stable increment in {stable_power:.1%}. Raw and conditional descriptive scores often remained high for proxies, confirming that the methods answer different questions rather than defining one universal ranking.",
+        ]
+
+    refit_lines = []
+    if args.refit_calibration and args.refit_calibration.is_file():
+        refit = pd.read_csv(args.refit_calibration)
+        null_max = refit.loc[~refit["expected_increment"], "support_rate"].max()
+        signal_min = refit.loc[refit["expected_increment"], "support_rate"].min()
+        refit_lines = [
+            "",
+            "## Refit-Aware Inference",
+            "",
+            f"In the initial 20-repetition full-refit grid, null/proxy strict support was at most {null_max:.1%} and stable-signal recovery was {signal_min:.1%}. A separate 500-repetition block-permutation null rejected 7.2%, so block-aware inference remains provisional rather than calibrated at nominal 5%.",
+        ]
+
     lines.extend(
         [
             *metadata_lines,
+            *comparison_lines,
+            *refit_lines,
             "",
             "## What This Changes",
             "",
@@ -114,8 +147,8 @@ def main() -> int:
             "",
             "## Remaining Gates",
             "",
-            "- calibrate nested or repeated-cross-fit uncertainty that refits nuisance models;",
-            "- compare directly with conditional mutual information and granulated statistics;",
+            "- calibrate the implemented refit bootstrap and block permutation across broader dependence structures;",
+            "- expand the shared CMI/granulated benchmark and add a formally calibrated conditional-independence comparator;",
             "- complete PGDL Tasks 1-2 real metric extraction;",
             "- freeze and execute Tasks 4-5 validation and Tasks 6-9 transfer once;",
             "- run prospective selection and independent replication.",

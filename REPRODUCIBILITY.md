@@ -19,6 +19,23 @@ Run package tests:
 python -m pytest -q
 ```
 
+Run the complete CPU-only credibility smoke test:
+
+```powershell
+.\reproduce_credibility.ps1
+```
+
+On Linux or macOS, use `./reproduce_credibility.sh`. Both scripts write smoke
+artifacts to the operating system's temporary directory, leaving the committed
+full-calibration evidence unchanged.
+
+The same check can run in the minimal reproduction container:
+
+```bash
+docker build -f Dockerfile.reproduction -t mbe-reproduction .
+docker run --rm mbe-reproduction
+```
+
 Run the CPU-only package demo:
 
 ```bash
@@ -38,6 +55,11 @@ python experiments/08_protocol_calibration/run_calibration.py
 This generates null, proxy, nonlinear-confounding, genuine-increment,
 Simpson-pooling, and post-treatment-control cases. The command exits nonzero if
 the declared audit profiles are not recovered.
+
+The broader comparator, power, and refit-aware inference checks live in
+`experiments/10_method_comparison/`. Protocol hashes, the machine-readable
+claim ledger, preregistration draft, and external-review packet live in
+`experiments/11_credibility_freeze/`.
 
 ## Reaudit A Published Metric Study
 

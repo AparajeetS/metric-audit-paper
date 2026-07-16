@@ -5,7 +5,9 @@ import pytest
 from mbe_eval import (
     classify_increment_evidence,
     cross_fitted_audit,
+    make_calibration_ledger,
     repeated_cross_fitted_audit,
+    refit_bootstrap_audit,
     run_calibration,
     run_monte_carlo_calibration,
 )
@@ -67,6 +69,18 @@ def test_rank_transform_is_fitted_on_training_values_only():
     assert changed_train_rank.tolist() == pytest.approx(train_rank)
 
 
+def test_numeric_polynomial_basis_is_bounded_outside_training_range() -> None:
+    from mbe_eval.crossfit import _numeric_block
+
+    train, test = _numeric_block(
+        pd.Series([-1.0, 0.0, 1.0]),
+        pd.Series([-1000.0, 1000.0]),
+        degree=6,
+    )
+    assert np.abs(np.column_stack(train)).max() <= 1.0
+    assert np.abs(np.column_stack(test)).max() <= 1.0
+
+
 def test_grouped_folds_never_split_a_configuration():
     frame = pd.DataFrame(
         {
@@ -106,6 +120,34 @@ def test_extra_trees_nuisance_model_detects_incremental_signal():
 
     assert result["nuisance_model"] == "extra_trees"
     assert result["delta_mse"] > 0.0
+
+
+def test_interaction_nuisance_retains_requested_univariate_degree() -> None:
+    rng = np.random.default_rng(41)
+    n = 300
+    control = rng.uniform(-2, 2, n)
+    second = rng.normal(size=n)
+    proxy = control**2 + rng.normal(0, 0.03, n)
+    frame = pd.DataFrame(
+        {
+            "control": control,
+            "second": second,
+            "metric": proxy,
+            "target": control**2 + 0.2 * control * second + rng.normal(0, 0.1, n),
+        }
+    )
+    result = cross_fitted_audit(
+        frame,
+        "metric",
+        "target",
+        ["control", "second"],
+        degree=6,
+        nuisance_model="polynomial_ridge_interactions",
+        permutations=19,
+        bootstrap=19,
+        seed=41,
+    )
+    assert result["increment_classification"] != "increment-supported"
 
 
 @pytest.mark.parametrize(
@@ -150,6 +192,43 @@ def test_repeated_crossfit_reports_fold_assignment_sensitivity():
     assert sensitivity["split_seed"].nunique() == 3
     assert len(sensitivity) == 3
     assert (sensitivity["delta_mse"] > 0).all()
+
+
+def test_refit_bootstrap_rebuilds_grouped_audit() -> None:
+    frame = make_calibration_ledger(n=180, seed=9)
+    frame = frame.loc[frame["scenario"] == "genuine_increment"].copy()
+    frame["group"] = np.arange(len(frame)) // 3
+    result = refit_bootstrap_audit(
+        frame,
+        "metric",
+        "target",
+        ["baseline"],
+        group_col="group",
+        degree=6,
+        refit_bootstrap=20,
+        permutations=19,
+        seed=14,
+    )
+    assert result["refit_bootstrap_successful"] == 20
+    assert result["refit_delta_mse_ci_low"] < result["refit_delta_mse_ci_high"]
+
+
+def test_permutation_blocks_must_be_constant_within_group() -> None:
+    frame = make_calibration_ledger(n=120, seed=19)
+    frame = frame.loc[frame["scenario"] == "genuine_increment"].copy()
+    frame["group"] = np.arange(len(frame)) // 2
+    frame["block"] = np.arange(len(frame)) % 2
+    with pytest.raises(ValueError, match="one permutation block"):
+        cross_fitted_audit(
+            frame,
+            "metric",
+            "target",
+            ["baseline"],
+            group_col="group",
+            permutation_block_col="block",
+            degree=6,
+            permutations=9,
+        )
 
 
 def test_monte_carlo_calibration_reports_error_and_power_rates():

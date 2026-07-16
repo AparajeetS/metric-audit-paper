@@ -19,6 +19,8 @@ Use this page as the map for the research repository.
 - [Conditional metric reliability protocol](CONDITIONAL_METRIC_RELIABILITY_PROTOCOL.md): frozen atlas, selector, and abstention design.
 - [Metric reliability audit service](METRIC_RELIABILITY_AUDIT_SERVICE.md): product hypothesis, deliverables, and research boundaries.
 - [MBE credibility ledger](MBE_CREDIBILITY_LEDGER.md): passed, failed, fixed, and still-blocked validation gates.
+- [Method comparison](../experiments/10_method_comparison/README.md): shared known-truth CMI, granulated Kendall, rank, and MBE benchmark.
+- [Credibility freeze](../experiments/11_credibility_freeze/PREREGISTRATION.md): preregistration, hashes, claim gate, and external-review packet.
 
 ## Legacy MBE 1.0 Material
 

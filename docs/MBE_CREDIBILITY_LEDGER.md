@@ -33,7 +33,7 @@ transport gates.
 | Real-design semi-synthetic calibration | Conditional pass | PGDL Tasks 1-2 preserve real sample sizes and hyperparameter geometry; the interaction ridge held null/proxy decisions to 0-2% | test additional frozen real-design signals and independent implementations |
 | Cross-fit leakage isolation | Fixed and tested | rank transforms are now fitted within each training fold; configurations never split across folds | external review and regression tests |
 | Published statistic reproduction | Partial pass | Dziugaite et al. source environments and ranking reproduced exactly; its MBE reaudit was regenerated after the fold-rank fix | add more studies with genuine run-level artifacts |
-| Method comparison | Partial | robust sign error and MBE shown to answer different questions | implement CMI/granulated comparisons under the same simulations |
+| Method comparison | Conditional pass | robust sign error is reproduced on public data; CMI, granulated Kendall, partial ranks, and MBE share a 50-repetition known-truth factorial benchmark | add a formally calibrated conditional-independence comparator and more designs |
 | PGDL development atlas | Not run | 24-specification metadata floor and 48-model implementation pilot only | complete metric battery on all Tasks 1-2 models |
 | PGDL validation | Protected | Tasks 4-5 labels exist but checkpoint metrics are unopened | freeze implementation and analysis first |
 | PGDL transfer holdout | Protected | Tasks 6-9 checkpoint metrics remain unopened | run once after validation freeze |
@@ -70,9 +70,32 @@ labels do not guarantee adequate nuisance adjustment.
 
 A transparent degree-six ridge basis with pairwise control interactions was
 then tested on the same PGDL semi-synthetic design. It held null/proxy joint
-decisions to 0-2% and recovered injected signals in 94-100% of repetitions.
+decisions to 0-2% and recovered injected signals in 97-100% of repetitions.
 It is eligible for later sensitivity analysis but is not selected as primary
 from real metric favorability.
+
+### Interaction-degree implementation mismatch
+
+The first interaction sensitivity was labeled degree six but its implementation
+discarded the degree argument and used first-order control terms plus pairwise
+interactions. The shared factorial benchmark exposed this because the model
+selected a known nonlinear design proxy. The implementation now retains the
+requested univariate polynomial degree and adds pairwise first-order
+interactions. The PGDL semi-synthetic and metadata-floor interaction outputs
+were regenerated after this correction. The pre-correction artifacts remain in
+Git history and must not be cited.
+
+### Raw polynomial bootstrap instability
+
+The first full-refit bootstrap exposed severe extrapolation from standardized
+degree-six raw powers when resampled folds omitted parts of the control range.
+One clustered-null lower Delta-MSE interval became numerically absurd and
+stable-signal recovery fell to 45%. Numeric controls are now transformed by a
+training-fold empirical CDF and expanded on the bounded interval `[-1, 1]`.
+After regeneration, all three tested null/proxy scenarios had 0/20 strict
+support and the stable increment had 20/20 support. The 500-repetition
+within-block permutation null rejected 7.2%, so that inference path remains
+provisional and mildly anti-conservative in the current finite experiment.
 
 This means MBE cannot treat one additive polynomial nuisance model as a
 validated default. Primary results require:
@@ -95,10 +118,10 @@ regenerated under that stricter rule.
 
 ### Nuisance-model uncertainty
 
-The current interval conditions on fitted out-of-fold nuisance models. Its
-bootstrap resamples out-of-fold inference units but does not refit nuisance
-models or fold assignments. Submission analyses need repeated cross-fitting or
-a nested/block bootstrap sensitivity that captures this variation.
+The package now includes a refit bootstrap that resamples independent groups,
+rebuilds fold assignments, and refits every nuisance model. It still requires
+repeated known-truth calibration before becoming the primary interval; the
+faster existing interval conditions on fitted out-of-fold nuisance models.
 
 Operational Delta MSE is relative to a fitted baseline learner. A metric can
 improve a weak learner by compressing information already present in baseline
@@ -110,9 +133,10 @@ keep those interpretations separate.
 
 Permuting residuals is exact only under appropriate exchangeability. Task,
 configuration, and heteroskedastic structures can violate that assumption.
-The current calibration includes heteroskedastic and clustered nulls; primary
-inference still needs block-aware alternatives and broader dependence
-structures.
+The current calibration includes heteroskedastic and clustered nulls, and the
+implementation now supports within-block residual permutation. Primary
+inference still needs calibration of that block-aware path and broader
+dependence structures.
 
 ### Control-set semantics
 
@@ -136,6 +160,9 @@ Currently supportable:
 - MBE can recover several known synthetic profiles;
 - source robust sign error and MBE incremental utility can disagree without
   contradiction;
+- on the current balanced-factorial benchmark, descriptive rank/CMI criteria
+  can remain high for known design proxies while corrected interaction MBE
+  mostly abstains;
 - metric behavior can be task-specific, motivating a reliability atlas.
 
 Not currently supportable:

@@ -50,6 +50,8 @@ novelty claim must pass the public-corpus comparison gate or be narrowed.
 - Conditional reliability protocol: [atlas, selector, and abstention design](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/CONDITIONAL_METRIC_RELIABILITY_PROTOCOL.md)
 - Metric audit service: [open-core product boundary](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/METRIC_RELIABILITY_AUDIT_SERVICE.md)
 - Credibility ledger: [passed, failed, fixed, and blocked evidence gates](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_CREDIBILITY_LEDGER.md)
+- Shared method comparison: [CMI, granulated Kendall, rank, and MBE benchmark](experiments/10_method_comparison/README.md)
+- Preregistration and claim gate: [credibility freeze](experiments/11_credibility_freeze/PREREGISTRATION.md)
 - Evidence ledger: [SUPPORTING_EVIDENCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SUPPORTING_EVIDENCE.md)
 - Reproducibility notes: [REPRODUCIBILITY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/REPRODUCIBILITY.md)
 - Legacy v1 protocol: [PROTOCOL_FREEZE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PROTOCOL_FREEZE.md)
