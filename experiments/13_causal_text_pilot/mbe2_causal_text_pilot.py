@@ -15,7 +15,7 @@ import uuid
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-if Path("/kaggle/working").exists():
+if sys.platform != "win32" and Path("/kaggle/working").exists():
     subprocess.check_call(
         [
             sys.executable,
@@ -157,7 +157,9 @@ def tokenize(paths: dict[str, Path]) -> tuple[dict[str, torch.Tensor], dict[str,
     counts: dict[str, int] = {}
     for word in train_words:
         counts[word] = counts.get(word, 0) + 1
-    vocabulary = ["<unk>"] + sorted(word for word, count in counts.items() if count >= 2)
+    vocabulary = ["<unk>"] + sorted(
+        word for word, count in counts.items() if count >= 2 and word != "<unk>"
+    )
     word_to_id = {word: index for index, word in enumerate(vocabulary)}
     encoded: dict[str, torch.Tensor] = {}
     for split, path in paths.items():
@@ -165,6 +167,8 @@ def tokenize(paths: dict[str, Path]) -> tuple[dict[str, torch.Tensor], dict[str,
         encoded[split] = torch.tensor(
             [word_to_id.get(word, 0) for word in words], dtype=torch.long
         )
+        if encoded[split].numel() and int(encoded[split].max()) >= len(word_to_id):
+            raise ValueError(f"{split} token id exceeds vocabulary bounds")
     return encoded, word_to_id
 
 
