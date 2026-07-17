@@ -17,6 +17,8 @@ changing the stable MBE v1 statistical estimand.
 - creates report output directories automatically;
 - consolidates package metadata, dependencies, extras, links, and console
   scripts in `pyproject.toml`;
+- installs scikit-learn with the development extra so the complete test suite
+  runs in clean environments;
 - exports `MBEInputError` and `validate_audit_inputs` as public API helpers.
 
 ## Compatibility
