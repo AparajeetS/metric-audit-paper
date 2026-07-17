@@ -26,3 +26,4 @@ experiments/**/__pycache__/
 experiments/**/local_*
 experiments/07_jmlr_scale/**/tinyshakespeare.txt
 experiments/07_jmlr_scale/tinyshakespeare.txt
+experiments/13_causal_text_pilot_runs/
