@@ -1,6 +1,72 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "mbe-eval"
+version = "0.4.0"
+description = "Marginal Baseline Evaluation for auditing machine-learning training metrics."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  {name = "Aparajeet Shadangi", email = "aparajeet.shadangi@proton.me"},
+]
+keywords = [
+  "machine learning",
+  "metrics",
+  "evaluation",
+  "generalization",
+  "partial correlation",
+  "reproducibility",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.0", "torchvision>=0.15"]
+checkpoint = ["h5py>=3.10"]
+flexible = ["scikit-learn>=1.3"]
+plot = ["matplotlib>=3.7", "seaborn>=0.12"]
+examples = ["torch>=2.0", "torchvision>=0.15", "scikit-learn>=1.3"]
+dev = ["pytest>=7", "build>=1.0", "twine>=4"]
+
+[project.scripts]
+mbe-eval-audit = "mbe_eval.cli:main"
+mbe-eval-demo = "mbe_eval.demo:main"
+
+[project.urls]
+Homepage = "https://github.com/AparajeetS/marginal-baseline-eval"
+Source = "https://github.com/AparajeetS/marginal-baseline-eval"
+Issues = "https://github.com/AparajeetS/marginal-baseline-eval/issues"
+Documentation = "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/README.md"
+Evidence = "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SUPPORTING_EVIDENCE.md"
+"Research program" = "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_2_RESEARCH_PROGRAM.md"
+"Replication protocol" = "https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/INDEPENDENT_REPLICATION_PROTOCOL.md"
+"Kaggle notebook" = "https://www.kaggle.com/code/aparajeetshadangi/audit-ml-training-metrics-with-mbe"
+
+[tool.setuptools.packages.find]
+include = ["mbe_eval*"]
+exclude = ["experiments*", "examples*", "docs*", "tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

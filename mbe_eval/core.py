@@ -14,6 +14,40 @@ DEFAULT_EFFECT_THRESHOLD = 0.20
 DEFAULT_WASHOUT_THRESHOLD = 0.10
 
 
+class MBEInputError(ValueError):
+    """Raised when an audit request does not match its training-run ledger."""
+
+
+def validate_audit_inputs(
+    df: pd.DataFrame,
+    metrics: Sequence[str],
+    target: str,
+    controls: Sequence[str],
+    groupby: Sequence[str] | str | None = None,
+) -> None:
+    """Validate audit columns before fitting any residualization model."""
+
+    if not isinstance(df, pd.DataFrame):
+        raise MBEInputError("df must be a pandas DataFrame")
+    if df.empty:
+        raise MBEInputError("the training-run ledger is empty")
+    if not metrics:
+        raise MBEInputError("at least one candidate metric is required")
+
+    group_cols = [groupby] if isinstance(groupby, str) else list(groupby or [])
+    requested = list(dict.fromkeys([*metrics, target, *controls, *group_cols]))
+    missing = [column for column in requested if column not in df.columns]
+    if missing:
+        available = ", ".join(map(str, df.columns[:12]))
+        suffix = " ..." if len(df.columns) > 12 else ""
+        raise MBEInputError(
+            f"unknown ledger column(s): {', '.join(missing)}. "
+            f"Available columns: {available}{suffix}"
+        )
+    if target in metrics:
+        raise MBEInputError("the held-out target cannot also be a candidate metric")
+
+
 @dataclass(frozen=True)
 class MBEReport:
     """Backward-compatible report for a single metric audit."""
@@ -101,6 +135,7 @@ def partial_rank_corr(
     t approximation, adjusted by the design matrix rank.
     """
 
+    validate_audit_inputs(df, [metric], target, controls)
     controls = [c for c in controls if c not in {metric, target}]
     cols = list(dict.fromkeys([metric, target, *[c for c in controls if c in df.columns]]))
     clean = df[cols].replace([np.inf, -np.inf], np.nan).dropna()
@@ -193,6 +228,9 @@ def audit_metric(
 ) -> dict[str, float | int | str]:
     """Audit one metric against one target under MBE controls."""
 
+    validate_audit_inputs(df, [metric], target, controls)
+    if bootstrap < 0:
+        raise MBEInputError("bootstrap must be zero or a positive integer")
     controls = [c for c in controls if c not in {metric, target}]
     cols = list(dict.fromkeys([metric, target, *[c for c in controls if c in df.columns]]))
     clean = df[cols].replace([np.inf, -np.inf], np.nan).dropna()
@@ -248,8 +286,13 @@ def audit_metrics(
     bootstrap:
         Number of bootstrap resamples for confidence intervals. Use 0 to skip.
     """
+    validate_audit_inputs(df, metrics, target, controls, groupby)
+    if bootstrap < 0:
+        raise MBEInputError("bootstrap must be zero or a positive integer")
+    if not include_pooled and not groupby:
+        raise MBEInputError("groupby is required when include_pooled is false")
 
-    available_metrics = [m for m in metrics if m in df.columns and m != target]
+    available_metrics = list(dict.fromkeys(metrics))
     rows: list[dict[str, float | int | str]] = []
     if include_pooled:
         for i, metric in enumerate(available_metrics):
@@ -345,6 +388,8 @@ __all__ = [
     "audit_metric",
     "audit_metrics",
     "classify_effect",
+    "MBEInputError",
     "partial_rank_corr",
     "spearman_corr",
+    "validate_audit_inputs",
 ]

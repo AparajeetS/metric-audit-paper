@@ -1,11 +1,13 @@
 from .core import (
     MBEEvaluator,
+    MBEInputError,
     MBEReport,
     audit_metric,
     audit_metrics,
     classify_effect,
     partial_rank_corr,
     spearman_corr,
+    validate_audit_inputs,
 )
 from .reporting import audit_report_markdown, summarize_audit, write_markdown_report
 from .crossfit import (
@@ -26,13 +28,18 @@ from .selection import (
     leave_one_task_out_global_choice,
     score_recommendations,
 )
+from importlib.metadata import PackageNotFoundError, version
 
-__version__ = "0.3.2"
+try:
+    __version__ = version("mbe-eval")
+except PackageNotFoundError:
+    __version__ = "0+unknown"
 
 __all__ = [
     "__version__",
     "MBEEvaluator",
     "MBEReport",
+    "MBEInputError",
     "audit_csv",
     "audit_report_markdown",
     "audit_metric",
@@ -68,6 +75,7 @@ __all__ = [
     "simulate_mbe_evaluation",
     "validate_study_manifest",
     "write_markdown_report",
+    "validate_audit_inputs",
 ]
 
 

@@ -90,6 +90,7 @@ def write_markdown_report(report: pd.DataFrame, path: str | Path, **kwargs) -> P
     """Write `audit_report_markdown` output and return the resolved path."""
 
     output = Path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(audit_report_markdown(report, **kwargs), encoding="utf-8")
     return output
 

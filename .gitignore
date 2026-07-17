@@ -5,6 +5,7 @@ __pycache__/
 htmlcov/
 build/
 dist/
+dist_release_*/
 *.egg-info/
 mbe_reports/
 kaggle_tmp/

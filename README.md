@@ -26,7 +26,7 @@ rank-correlation.
 This is an active research direction with an accompanying Python package,
 Kaggle-scale experiment artifacts, and a public walkthrough notebook.
 
-**Software status:** `mbe-eval` v0.3.2 implements the stable MBE v1
+**Software status:** `mbe-eval` v0.4.0 implements the stable MBE v1
 partial-rank audit. MBE 2.0 is the active research design and is not yet fully
 implemented or empirically validated. See the [open research inventory](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/OPEN_RESEARCH.md)
 for a precise map of what is available now.
@@ -50,10 +50,10 @@ novelty claim must pass the public-corpus comparison gate or be narrowed.
 - Conditional reliability protocol: [atlas, selector, and abstention design](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/CONDITIONAL_METRIC_RELIABILITY_PROTOCOL.md)
 - Metric audit service: [open-core product boundary](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/METRIC_RELIABILITY_AUDIT_SERVICE.md)
 - Credibility ledger: [passed, failed, fixed, and blocked evidence gates](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/MBE_CREDIBILITY_LEDGER.md)
-- Shared method comparison: [CMI, granulated Kendall, rank, and MBE benchmark](experiments/10_method_comparison/README.md)
-- Preregistration and claim gate: [credibility freeze](experiments/11_credibility_freeze/PREREGISTRATION.md)
-- Statistical specification: [estimand, inference, and assumptions](docs/STATISTICAL_ESTIMAND_AND_INFERENCE.md)
-- Paper workspace: [JMLR manuscript skeleton and generated tables](paper/README.md)
+- Shared method comparison: [CMI, granulated Kendall, rank, and MBE benchmark](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/experiments/10_method_comparison/README.md)
+- Preregistration and claim gate: [credibility freeze](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/experiments/11_credibility_freeze/PREREGISTRATION.md)
+- Statistical specification: [estimand, inference, and assumptions](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/docs/STATISTICAL_ESTIMAND_AND_INFERENCE.md)
+- Paper workspace: [JMLR manuscript skeleton and generated tables](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/paper/README.md)
 - Evidence ledger: [SUPPORTING_EVIDENCE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/SUPPORTING_EVIDENCE.md)
 - Reproducibility notes: [REPRODUCIBILITY.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/REPRODUCIBILITY.md)
 - Legacy v1 protocol: [PROTOCOL_FREEZE.md](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/PROTOCOL_FREEZE.md)
@@ -166,8 +166,14 @@ mbe-eval-audit \
   --controls learning_rate,weight_decay,optimizer,arch \
   --groupby task \
   --bootstrap 200 \
-  --output audit_report.md
+  --seed 42 \
+  --output audit_report.md \
+  --results audit_results.json
 ```
+
+The CLI fails closed if a requested metric, target, control, or grouping column
+is absent. Use `--results audit_results.csv` or `--results audit_results.json`
+for machine-readable output suitable for experiment pipelines and AI agents.
 
 ## Basic API
 

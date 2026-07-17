@@ -22,7 +22,10 @@ def audit_csv(
     controls: list[str],
     groupby: list[str] | None = None,
     bootstrap: int = 0,
+    seed: int = 0,
+    include_pooled: bool = True,
     output: str | Path | None = None,
+    results: str | Path | None = None,
 ) -> pd.DataFrame:
     """Audit metrics from a CSV training-run ledger."""
 
@@ -34,6 +37,8 @@ def audit_csv(
         controls=controls,
         groupby=groupby or None,
         bootstrap=bootstrap,
+        seed=seed,
+        include_pooled=include_pooled,
     )
     if output:
         write_markdown_report(
@@ -44,6 +49,17 @@ def audit_csv(
             controls=controls,
             notes=[f"Source CSV: `{csv_path}`"],
         )
+    if results:
+        results_path = Path(results)
+        results_path.parent.mkdir(parents=True, exist_ok=True)
+        if results_path.suffix.lower() == ".json":
+            results_path.write_text(
+                report.to_json(orient="records", indent=2), encoding="utf-8"
+            )
+        elif results_path.suffix.lower() == ".csv":
+            report.to_csv(results_path, index=False)
+        else:
+            raise ValueError("results path must end in .csv or .json")
     return report
 
 
@@ -56,21 +72,36 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--controls", required=True, help="Comma-separated baseline/control columns.")
     parser.add_argument("--groupby", default="", help="Optional comma-separated grouping columns.")
     parser.add_argument("--bootstrap", type=int, default=0, help="Bootstrap resamples.")
+    parser.add_argument("--seed", type=int, default=0, help="Bootstrap random seed.")
+    parser.add_argument(
+        "--no-pooled", action="store_true", help="Only emit grouped audit rows."
+    )
     parser.add_argument("--output", default="", help="Optional markdown report path.")
+    parser.add_argument(
+        "--results", default="", help="Optional machine-readable .csv or .json results path."
+    )
     args = parser.parse_args(argv)
 
-    report = audit_csv(
-        args.csv,
-        metrics=_split_csv_arg(args.metrics),
-        target=args.target,
-        controls=_split_csv_arg(args.controls),
-        groupby=_split_csv_arg(args.groupby),
-        bootstrap=args.bootstrap,
-        output=args.output or None,
-    )
+    try:
+        report = audit_csv(
+            args.csv,
+            metrics=_split_csv_arg(args.metrics),
+            target=args.target,
+            controls=_split_csv_arg(args.controls),
+            groupby=_split_csv_arg(args.groupby),
+            bootstrap=args.bootstrap,
+            seed=args.seed,
+            include_pooled=not args.no_pooled,
+            output=args.output or None,
+            results=args.results or None,
+        )
+    except (FileNotFoundError, ValueError) as error:
+        parser.error(str(error))
     print(summarize_audit(report).to_string(index=False))
     if args.output:
         print(f"\nWrote {Path(args.output).resolve()}")
+    if args.results:
+        print(f"Wrote {Path(args.results).resolve()}")
     return 0
 
 
