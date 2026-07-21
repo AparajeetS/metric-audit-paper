@@ -24,7 +24,7 @@ MBE 2.0 asks five distinct questions:
 
 The software is usable today. Researchers can install `mbe-eval`, run a
 CPU-only demonstration, audit a CSV training ledger, inspect the implementation,
-and generate a Markdown report. The current v0.3.1 release implements the MBE
+and generate a Markdown report. The current v0.3.2 release implements the MBE
 v1 linear partial-rank audit.
 
 The scientific program is earlier-stage. Existing Kaggle runs are exploratory

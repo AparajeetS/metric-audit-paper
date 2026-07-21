@@ -4,6 +4,10 @@ Use this page as the map for the research repository.
 
 ## Start Here
 
+- [Cosmos reviewer guide](../COSMOS_REVIEWER_GUIDE.md): three-minute path through the benchmark-audit idea, real-data pilot, limits, and proposed next step.
+- [Experimental benchmark audit specification](BENCHMARK_AUDIT_PROTOTYPE.md): implemented checks, input contract, evidence states, and prohibited claims.
+- [TruthfulQA pilot protocol](../experiments/08_truthfulqa_real_audit/PROTOCOL.md): frozen source, cohort, variables, thresholds, and permitted interpretation.
+- [TruthfulQA pilot result](../experiments/08_truthfulqa_real_audit/artifacts/RESULTS.md): concise result with its interpretation boundary.
 - [MBE 2.0 research program](MBE_2_RESEARCH_PROGRAM.md): current technical source of truth.
 - [JMLR milestone roadmap](JMLR_MILESTONE_ROADMAP.md): gated path from protocol freeze to submission.
 - [Compute and cost plan](COMPUTE_AND_COST_PLAN.md): minimum and recommended resource budgets.

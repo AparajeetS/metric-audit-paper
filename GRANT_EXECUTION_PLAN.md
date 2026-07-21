@@ -1,5 +1,10 @@
 # Grant Execution Plan
 
+> **Scope note:** This is a longer-horizon, $25,000 validation plan for the full
+> MBE 2.0 research program. It is not the budget or promised scope of the
+> $6,500 Cosmos proposal for the experimental Benchmark Audit Toolkit. Cosmos
+> reviewers should start with [the dedicated reviewer guide](COSMOS_REVIEWER_GUIDE.md).
+
 This document maps a proposed $25,000 public-goods grant to a falsifiable MBE
 2.0 validation program. It is a plan, not completed evidence.
 

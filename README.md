@@ -5,6 +5,11 @@
 [![Python](https://img.shields.io/pypi/pyversions/mbe-eval.svg)](https://pypi.org/project/mbe-eval/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/AparajeetS/marginal-baseline-eval/blob/master/LICENSE)
 
+> **Reviewing the Cosmos proposal?** Start with
+> [A Benchmark Is a Claim, Not Just a Score](COSMOS_REVIEWER_GUIDE.md), a
+> three-minute guide to the working prototype, real-data evidence, claim limits,
+> and the next 90 days.
+
 **Marginal Baseline Evaluation (MBE)** is an audit protocol for testing whether
 machine-learning training metrics still predict held-out performance after
 controlling for ordinary baselines such as learning rate, weight decay,
@@ -121,6 +126,10 @@ validity, or certify a benchmark or model.
 - [Cohort exclusions and retained categories](experiments/08_truthfulqa_real_audit/artifacts/cohort_manifest.json)
 - [Human-informativeness baseline sensitivity](experiments/08_truthfulqa_real_audit/artifacts/INFORMATIVENESS_SENSITIVITY.md)
 - [Reproduction instructions](experiments/08_truthfulqa_real_audit/README.md)
+
+For the shortest reviewer-facing account of why the pilot was designed this
+way, what changed before analysis, and what the result does and does not mean,
+read the [Cosmos reviewer guide](COSMOS_REVIEWER_GUIDE.md).
 
 MBE does not claim that partial correlation or hyperparameter conditioning is
 new. The proposed contribution is their calibrated integration with a baseline
