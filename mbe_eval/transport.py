@@ -31,6 +31,7 @@ def leave_one_environment_out_audit(
     environment: str,
     degree: int = 2,
     ridge: float = 1e-3,
+    numeric_control_transform: str = "rank",
     permutations: int = 0,
     bootstrap: int = 0,
     seed: int = 0,
@@ -80,6 +81,8 @@ def leave_one_environment_out_audit(
     ridge = float(ridge)
     if not np.isfinite(ridge) or ridge < 0:
         raise ValueError("ridge must be a finite non-negative number")
+    if numeric_control_transform not in {"rank", "zscore"}:
+        raise ValueError("numeric_control_transform must be 'rank' or 'zscore'")
     permutations = _require_non_negative_integer(permutations, "permutations")
     bootstrap = _require_non_negative_integer(bootstrap, "bootstrap")
     if isinstance(seed, bool) or not isinstance(seed, Integral):
@@ -112,6 +115,7 @@ def leave_one_environment_out_audit(
             n_splits=len(environments),
             degree=int(degree),
             ridge=ridge,
+            numeric_control_transform=numeric_control_transform,
             permutations=permutations,
             bootstrap=bootstrap,
             seed=int(seed),

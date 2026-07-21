@@ -1,0 +1,6 @@
+FROM python:3.11-slim
+
+WORKDIR /work
+COPY . /work
+RUN python -m pip install --no-cache-dir -e ".[dev]"
+CMD ["sh", "reproduce_credibility.sh"]

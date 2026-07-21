@@ -6,8 +6,8 @@ authors:
     given-names: "Aparajeet"
 year: 2026
 license: MIT
-version: "0.3.2"
-date-released: 2026-07-14
+version: "0.4.0"
+date-released: 2026-07-18
 repository-code: "https://github.com/AparajeetS/marginal-baseline-eval"
 url: "https://pypi.org/project/mbe-eval/"
 keywords:

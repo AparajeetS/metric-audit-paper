@@ -5,6 +5,7 @@ __pycache__/
 htmlcov/
 build/
 dist/
+dist_release_*/
 *.egg-info/
 mbe_reports/
 kaggle_tmp/
@@ -26,3 +27,4 @@ experiments/**/__pycache__/
 experiments/**/local_*
 experiments/07_jmlr_scale/**/tinyshakespeare.txt
 experiments/07_jmlr_scale/tinyshakespeare.txt
+experiments/13_causal_text_pilot_runs/

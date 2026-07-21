@@ -15,6 +15,7 @@
 - Declared baselines or proxies: `answer_length_tokens`, `question_length_tokens`, `refusal_or_uncertainty_flag`, `question_type`, `correct_reference_count`, `incorrect_reference_count`
 - Environment: `category`
 - Independence unit: `question_id`
+- Numeric control transform: `zscore`
 
 ## Estimand Results
 

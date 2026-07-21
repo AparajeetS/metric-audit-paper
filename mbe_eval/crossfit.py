@@ -14,19 +14,52 @@ def _ridge_fit(x: np.ndarray, y: np.ndarray, alpha: float) -> np.ndarray:
     return np.linalg.pinv(x.T @ x + penalty) @ x.T @ y
 
 
+def _extra_trees_predict(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    x_test: np.ndarray,
+    seed: int,
+) -> np.ndarray:
+    try:
+        from sklearn.ensemble import ExtraTreesRegressor
+    except ImportError as exc:  # pragma: no cover - depends on optional extra
+        raise ImportError(
+            "extra_trees nuisance adjustment requires scikit-learn; "
+            "install mbe-eval[flexible]"
+        ) from exc
+    model = ExtraTreesRegressor(
+        n_estimators=128,
+        min_samples_leaf=5,
+        max_features=1.0,
+        random_state=seed,
+        n_jobs=1,
+    )
+    model.fit(x_train, y_train)
+    return model.predict(x_test)
+
+
 def _numeric_block(
     train: pd.Series,
     test: pd.Series,
     degree: int,
+    *,
+    transform: str = "rank",
 ) -> tuple[list[np.ndarray], list[np.ndarray]]:
     train_values = train.to_numpy(dtype=float)
     test_values = test.to_numpy(dtype=float)
-    mean = float(np.mean(train_values))
-    scale = float(np.std(train_values))
-    if not np.isfinite(scale) or scale < 1e-12:
-        scale = 1.0
-    train_z = np.clip((train_values - mean) / scale, -8.0, 8.0)
-    test_z = np.clip((test_values - mean) / scale, -8.0, 8.0)
+    if transform == "rank":
+        train_rank, test_rank = _rank_train_test(train_values, test_values)
+        train_z = 2.0 * train_rank - 1.0
+        test_z = 2.0 * test_rank - 1.0
+    elif transform == "zscore":
+        mean = float(np.mean(train_values))
+        scale = float(np.std(train_values))
+        if not np.isfinite(scale) or scale < 1e-12:
+            scale = 1.0
+        train_z = np.clip((train_values - mean) / scale, -8.0, 8.0)
+        test_z = np.clip((test_values - mean) / scale, -8.0, 8.0)
+    else:
+        raise ValueError("numeric transform must be 'rank' or 'zscore'")
     return (
         [np.power(train_z, power) for power in range(1, degree + 1)],
         [np.power(test_z, power) for power in range(1, degree + 1)],
@@ -38,6 +71,8 @@ def _design_train_test(
     test: pd.DataFrame,
     controls: Sequence[str],
     degree: int,
+    *,
+    numeric_transform: str = "rank",
 ) -> tuple[np.ndarray, np.ndarray]:
     train_blocks: list[np.ndarray] = [np.ones(len(train), dtype=float)]
     test_blocks: list[np.ndarray] = [np.ones(len(test), dtype=float)]
@@ -48,6 +83,7 @@ def _design_train_test(
                 train[control].astype(float),
                 test[control].astype(float),
                 degree,
+                transform=numeric_transform,
             )
             train_blocks.extend(train_numeric)
             test_blocks.extend(test_numeric)
@@ -64,8 +100,8 @@ def _design_train_test(
 
 
 def _rank_train_test(
-    train: pd.Series,
-    test: pd.Series,
+    train: pd.Series | np.ndarray,
+    test: pd.Series | np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Map train and test values through the training-fold empirical CDF.
 
@@ -75,17 +111,33 @@ def _rank_train_test(
     representation.
     """
 
-    train_values = train.to_numpy(dtype=float)
-    test_values = test.to_numpy(dtype=float)
+    train_values = np.asarray(train, dtype=float)
+    test_values = np.asarray(test, dtype=float)
+    if train_values.size == 0:
+        raise ValueError("rank transform requires a non-empty training fold")
     sorted_train = np.sort(train_values)
     denominator = float(len(sorted_train))
 
     def transform(values: np.ndarray) -> np.ndarray:
         left = np.searchsorted(sorted_train, values, side="left")
         right = np.searchsorted(sorted_train, values, side="right")
-        return (left + right).astype(float) / (2.0 * denominator)
+        midrank = (left + right + 1.0).astype(float) / (2.0 * denominator)
+        return np.clip(midrank, 1.0 / denominator, 1.0)
 
     return transform(train_values), transform(test_values)
+
+
+def _pairwise_interactions(
+    train: np.ndarray,
+    test: np.ndarray,
+) -> tuple[list[np.ndarray], list[np.ndarray]]:
+    train_blocks: list[np.ndarray] = []
+    test_blocks: list[np.ndarray] = []
+    for left in range(1, train.shape[1]):
+        for right in range(left + 1, train.shape[1]):
+            train_blocks.append(train[:, left] * train[:, right])
+            test_blocks.append(test[:, left] * test[:, right])
+    return train_blocks, test_blocks
 
 
 def _fold_ids(
@@ -162,6 +214,42 @@ def _permutation_p_value(
     return float((exceedances + 1) / (permutations + 1))
 
 
+def classify_increment_evidence(
+    residual_p: float,
+    delta_mse_ci_low: float,
+    *,
+    alpha: float = 0.05,
+    minimum_delta_mse: float = 0.0,
+) -> str:
+    """Keep residual dependence and predictive improvement logically separate."""
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must lie strictly between zero and one")
+    residual_supported = np.isfinite(residual_p) and residual_p <= alpha
+    predictive_supported = (
+        np.isfinite(delta_mse_ci_low) and delta_mse_ci_low > minimum_delta_mse
+    )
+    if residual_supported and predictive_supported:
+        return "increment-supported"
+    if residual_supported:
+        return "residual-dependence-only"
+    if predictive_supported:
+        return "predictive-improvement-only"
+    return "no-supported-increment"
+
+
+def classify_predictive_increment(
+    delta_mse_ci_low: float,
+    *,
+    minimum_delta_mse: float = 0.0,
+) -> str:
+    """Classify learner-relative increment from a full-refit lower interval."""
+    if not np.isfinite(delta_mse_ci_low):
+        return "insufficient-inference"
+    if delta_mse_ci_low > minimum_delta_mse:
+        return "increment-supported"
+    return "no-supported-increment"
+
+
 def cross_fitted_audit(
     df: pd.DataFrame,
     metric: str,
@@ -169,18 +257,22 @@ def cross_fitted_audit(
     controls: Sequence[str],
     *,
     group_col: str | None = None,
+    permutation_block_col: str | None = None,
     n_splits: int = 5,
     degree: int = 2,
     ridge: float = 1e-3,
+    nuisance_model: str = "polynomial_ridge",
+    numeric_control_transform: str = "rank",
     permutations: int = 0,
     bootstrap: int = 0,
     seed: int = 0,
 ) -> dict[str, float | int | str]:
     """Estimate incremental metric signal with grouped cross-fitting.
 
-    Numeric controls are expanded into a frozen polynomial basis within each
-    training fold. Categorical controls are one-hot encoded from training-fold
-    levels. The function reports out-of-fold residual dependence and the change
+    Numeric controls are transformed and expanded into a polynomial basis using
+    training-fold statistics only. Categorical controls are one-hot encoded from
+    training-fold levels. The function reports out-of-fold residual dependence
+    and the change
     in target mean-squared error from adding the metric to the baseline model.
 
     This is a compact reference implementation for protocol calibration. It is
@@ -191,11 +283,25 @@ def cross_fitted_audit(
         raise ValueError("n_splits must be at least 2")
     if degree < 1:
         raise ValueError("degree must be at least 1")
+    if nuisance_model not in {
+        "polynomial_ridge",
+        "polynomial_ridge_interactions",
+        "extra_trees",
+    }:
+        raise ValueError(
+            "nuisance_model must be 'polynomial_ridge', "
+            "'polynomial_ridge_interactions', or 'extra_trees'"
+        )
+    if numeric_control_transform not in {"rank", "zscore"}:
+        raise ValueError("numeric_control_transform must be 'rank' or 'zscore'")
 
     controls = list(dict.fromkeys(c for c in controls if c not in {metric, target}))
     required = [metric, target, *controls]
     if group_col:
         required.append(group_col)
+    if permutation_block_col:
+        required.append(permutation_block_col)
+    required = list(dict.fromkeys(required))
     missing = [column for column in required if column not in df.columns]
     if missing:
         raise ValueError(f"missing required columns: {', '.join(missing)}")
@@ -210,6 +316,8 @@ def cross_fitted_audit(
         raise ValueError("cross-fitted audit requires at least 20 complete rows")
 
     fold_ids = _fold_ids(clean, n_splits, seed, group_col)
+    target_values = clean[target].to_numpy(dtype=float)
+    metric_values = clean[metric].to_numpy(dtype=float)
     target_rank = np.full(len(clean), np.nan, dtype=float)
     metric_rank = np.full(len(clean), np.nan, dtype=float)
     target_pred = np.full(len(clean), np.nan, dtype=float)
@@ -221,29 +329,91 @@ def cross_fitted_audit(
         train_idx = np.flatnonzero(fold_ids != fold)
         train = clean.iloc[train_idx]
         test = clean.iloc[test_idx]
+        design_degree = (
+            degree
+            if nuisance_model
+            in {"polynomial_ridge", "polynomial_ridge_interactions"}
+            else 1
+        )
+        x_train, x_test = _design_train_test(
+            train,
+            test,
+            controls,
+            design_degree,
+            numeric_transform=numeric_control_transform,
+        )
+        interaction_base_train = None
+        interaction_base_test = None
+        if nuisance_model == "polynomial_ridge_interactions":
+            interaction_base_train, interaction_base_test = _design_train_test(
+                train,
+                test,
+                controls,
+                1,
+                numeric_transform=numeric_control_transform,
+            )
+            train_interactions, test_interactions = _pairwise_interactions(
+                interaction_base_train, interaction_base_test
+            )
+            if train_interactions:
+                x_train = np.column_stack([x_train, *train_interactions])
+                x_test = np.column_stack([x_test, *test_interactions])
         target_train_rank, target_test_rank = _rank_train_test(
-            train[target], test[target]
+            target_values[train_idx], target_values[test_idx]
         )
         metric_train_rank, metric_test_rank = _rank_train_test(
-            train[metric], test[metric]
+            metric_values[train_idx], metric_values[test_idx]
         )
-        target_rank[test_idx] = target_test_rank
-        metric_rank[test_idx] = metric_test_rank
-        x_train, x_test = _design_train_test(train, test, controls, degree)
-        metric_train_blocks, metric_test_blocks = _numeric_block(
-            pd.Series(metric_train_rank),
-            pd.Series(metric_test_rank),
-            degree,
-        )
+        if nuisance_model == "polynomial_ridge":
+            metric_train_blocks, metric_test_blocks = _numeric_block(
+                pd.Series(metric_train_rank),
+                pd.Series(metric_test_rank),
+                degree,
+                transform=numeric_control_transform,
+            )
+        else:
+            metric_train_blocks = [metric_train_rank]
+            metric_test_blocks = [metric_test_rank]
         x_aug_train = np.column_stack([x_train, *metric_train_blocks])
         x_aug_test = np.column_stack([x_test, *metric_test_blocks])
+        if nuisance_model == "polynomial_ridge_interactions":
+            metric_control_train = [
+                metric_train_rank * interaction_base_train[:, column]
+                for column in range(1, interaction_base_train.shape[1])
+            ]
+            metric_control_test = [
+                metric_test_rank * interaction_base_test[:, column]
+                for column in range(1, interaction_base_test.shape[1])
+            ]
+            if metric_control_train:
+                x_aug_train = np.column_stack(
+                    [x_aug_train, *metric_control_train]
+                )
+                x_aug_test = np.column_stack([x_aug_test, *metric_control_test])
 
-        target_beta = _ridge_fit(x_train, target_train_rank, ridge)
-        metric_beta = _ridge_fit(x_train, metric_train_rank, ridge)
-        augmented_beta = _ridge_fit(x_aug_train, target_train_rank, ridge)
-        target_pred[test_idx] = x_test @ target_beta
-        metric_pred[test_idx] = x_test @ metric_beta
-        augmented_pred[test_idx] = x_aug_test @ augmented_beta
+        target_rank[test_idx] = target_test_rank
+        metric_rank[test_idx] = metric_test_rank
+        if nuisance_model in {
+            "polynomial_ridge",
+            "polynomial_ridge_interactions",
+        }:
+            target_beta = _ridge_fit(x_train, target_train_rank, ridge)
+            metric_beta = _ridge_fit(x_train, metric_train_rank, ridge)
+            augmented_beta = _ridge_fit(x_aug_train, target_train_rank, ridge)
+            target_pred[test_idx] = x_test @ target_beta
+            metric_pred[test_idx] = x_test @ metric_beta
+            augmented_pred[test_idx] = x_aug_test @ augmented_beta
+        else:
+            model_seed = seed + int(fold) * 10_007
+            target_pred[test_idx] = _extra_trees_predict(
+                x_train, target_train_rank, x_test, model_seed
+            )
+            metric_pred[test_idx] = _extra_trees_predict(
+                x_train, metric_train_rank, x_test, model_seed + 1
+            )
+            augmented_pred[test_idx] = _extra_trees_predict(
+                x_aug_train, target_train_rank, x_aug_test, model_seed + 2
+            )
 
     target_residual = target_rank - target_pred
     metric_residual = metric_rank - metric_pred
@@ -253,8 +423,13 @@ def cross_fitted_audit(
 
     inference_metric = metric_residual
     inference_target = target_residual
+    inference_blocks = (
+        clean[permutation_block_col].astype(str).to_numpy()
+        if permutation_block_col
+        else None
+    )
     if group_col:
-        cluster = pd.DataFrame(
+        cluster_frame = pd.DataFrame(
             {
                 "group": clean[group_col].astype(str).to_numpy(),
                 "metric_residual": metric_residual,
@@ -262,7 +437,18 @@ def cross_fitted_audit(
                 "baseline_squared_error": baseline_squared_error,
                 "augmented_squared_error": augmented_squared_error,
             }
-        ).groupby("group", sort=True).mean()
+        )
+        if permutation_block_col:
+            cluster_frame["block"] = clean[permutation_block_col].astype(str).to_numpy()
+            block_counts = cluster_frame.groupby("group", sort=True)["block"].nunique()
+            if (block_counts > 1).any():
+                raise ValueError(
+                    "each inference group must belong to one permutation block"
+                )
+            inference_blocks = (
+                cluster_frame.groupby("group", sort=True)["block"].first().to_numpy()
+            )
+        cluster = cluster_frame.groupby("group", sort=True).mean(numeric_only=True)
         inference_metric = cluster["metric_residual"].to_numpy(dtype=float)
         inference_target = cluster["target_residual"].to_numpy(dtype=float)
         inference_baseline_error = cluster["baseline_squared_error"].to_numpy(dtype=float)
@@ -284,7 +470,7 @@ def cross_fitted_audit(
             residual_r,
             permutations,
             rng,
-            None,
+            inference_blocks,
         )
 
     residual_ci_low = math.nan
@@ -321,15 +507,22 @@ def cross_fitted_audit(
             bootstrap_delta, [0.025, 0.975]
         )
 
+    increment_classification = classify_increment_evidence(
+        permutation_p,
+        float(delta_mse_ci_low),
+    )
     return {
         "metric": metric,
         "target": target,
         "controls": ",".join(controls),
         "group_col": group_col or "",
+        "permutation_block_col": permutation_block_col or "",
         "n": len(clean),
         "independence_units": len(inference_metric),
         "n_splits": int(len(np.unique(fold_ids))),
         "polynomial_degree": degree,
+        "nuisance_model": nuisance_model,
+        "numeric_control_transform": numeric_control_transform,
         "run_residual_r": run_residual_r,
         "residual_r": residual_r,
         "residual_p": permutation_p,
@@ -343,7 +536,141 @@ def cross_fitted_audit(
         "relative_mse_improvement": (baseline_mse - augmented_mse) / baseline_mse
         if baseline_mse > 0
         else math.nan,
+        "increment_classification": increment_classification,
     }
 
 
-__all__ = ["cross_fitted_audit"]
+def repeated_cross_fitted_audit(
+    df: pd.DataFrame,
+    metric: str,
+    target: str,
+    controls: Sequence[str],
+    *,
+    repeats: int = 10,
+    seed: int = 0,
+    seed_stride: int = 100_003,
+    **audit_kwargs: object,
+) -> pd.DataFrame:
+    """Repeat the full audit across fold assignments without combining p-values."""
+    if repeats < 2:
+        raise ValueError("repeated cross-fitting requires at least two repeats")
+    if "seed" in audit_kwargs:
+        raise ValueError("pass the initial seed through the seed argument")
+    rows = []
+    for repeat in range(repeats):
+        split_seed = seed + repeat * seed_stride
+        result = cross_fitted_audit(
+            df,
+            metric,
+            target,
+            controls,
+            seed=split_seed,
+            **audit_kwargs,
+        )
+        rows.append({"repeat": repeat, "split_seed": split_seed, **result})
+    return pd.DataFrame(rows)
+
+
+def refit_bootstrap_audit(
+    df: pd.DataFrame,
+    metric: str,
+    target: str,
+    controls: Sequence[str],
+    *,
+    refit_bootstrap: int = 199,
+    permutations: int = 199,
+    group_col: str | None = None,
+    seed: int = 0,
+    **audit_kwargs: object,
+) -> dict[str, float | int | str]:
+    """Bootstrap independent units and refit the complete audit in every draw."""
+    if refit_bootstrap < 20:
+        raise ValueError("refit_bootstrap must be at least 20")
+    forbidden = {"seed", "bootstrap", "permutations", "group_col"} & audit_kwargs.keys()
+    if forbidden:
+        raise ValueError(f"pass {', '.join(sorted(forbidden))} as named arguments")
+
+    base = cross_fitted_audit(
+        df,
+        metric,
+        target,
+        controls,
+        group_col=group_col,
+        permutations=permutations,
+        bootstrap=0,
+        seed=seed,
+        **audit_kwargs,
+    )
+    rng = np.random.default_rng(seed + 3_000_003)
+    residual_draws: list[float] = []
+    delta_draws: list[float] = []
+
+    if group_col:
+        source_groups = df[group_col].dropna().astype(str).unique()
+        if len(source_groups) < 2:
+            raise ValueError("refit bootstrap requires at least two independent groups")
+    else:
+        source_groups = np.arange(len(df))
+
+    for draw in range(refit_bootstrap):
+        sampled = rng.choice(source_groups, size=len(source_groups), replace=True)
+        if group_col:
+            pieces = []
+            group_values = df[group_col].astype(str)
+            for occurrence, sampled_group in enumerate(sampled):
+                piece = df.loc[group_values == sampled_group].copy()
+                piece[group_col] = f"{sampled_group}__bootstrap_{occurrence}"
+                pieces.append(piece)
+            bootstrap_frame = pd.concat(pieces, ignore_index=True)
+        else:
+            bootstrap_frame = df.iloc[np.asarray(sampled, dtype=int)].reset_index(drop=True)
+        try:
+            result = cross_fitted_audit(
+                bootstrap_frame,
+                metric,
+                target,
+                controls,
+                group_col=group_col,
+                permutations=0,
+                bootstrap=0,
+                seed=seed + (draw + 1) * 100_003,
+                **audit_kwargs,
+            )
+        except (ValueError, np.linalg.LinAlgError):
+            continue
+        residual_draws.append(float(result["residual_r"]))
+        delta_draws.append(float(result["delta_mse"]))
+
+    minimum_success = max(20, math.ceil(refit_bootstrap * 0.8))
+    if len(delta_draws) < minimum_success:
+        raise RuntimeError(
+            f"only {len(delta_draws)} of {refit_bootstrap} refit bootstrap draws succeeded"
+        )
+    residual_ci = np.nanquantile(residual_draws, [0.025, 0.975])
+    delta_ci = np.nanquantile(delta_draws, [0.025, 0.975])
+    base.update(
+        {
+            "refit_bootstrap_draws": refit_bootstrap,
+            "refit_bootstrap_successful": len(delta_draws),
+            "refit_residual_ci_low": float(residual_ci[0]),
+            "refit_residual_ci_high": float(residual_ci[1]),
+            "refit_delta_mse_ci_low": float(delta_ci[0]),
+            "refit_delta_mse_ci_high": float(delta_ci[1]),
+            "refit_predictive_classification": classify_predictive_increment(
+                float(delta_ci[0])
+            ),
+            "refit_increment_classification": classify_increment_evidence(
+                float(base["residual_p"]), float(delta_ci[0])
+            ),
+        }
+    )
+    return base
+
+
+__all__ = [
+    "classify_increment_evidence",
+    "classify_predictive_increment",
+    "cross_fitted_audit",
+    "refit_bootstrap_audit",
+    "repeated_cross_fitted_audit",
+]

@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from mbe_eval import (
     __version__,
     MBEEvaluator,
+    MBEInputError,
     audit_csv,
     audit_metric,
     audit_metrics,
@@ -16,7 +18,7 @@ from mbe_eval import (
 
 
 def test_public_version_matches_release():
-    assert __version__ == "0.4.0.dev0"
+    assert __version__ == "0.4.0"
 
 
 def synthetic_frame(seed=0, n=300):
@@ -157,3 +159,41 @@ def test_csv_cli_helper_audits_training_ledger(tmp_path):
     assert set(report["metric"]) == {"proxy_metric", "residual_metric"}
     assert out_path.exists()
     assert "MBE CSV Audit Report" in out_path.read_text(encoding="utf-8")
+
+
+def test_audit_fails_closed_on_unknown_columns():
+    df = synthetic_frame(n=40)
+
+    with pytest.raises(MBEInputError, match="unknown ledger column"):
+        audit_metrics(
+            df,
+            metrics=["proxy_mteric"],
+            target="target",
+            controls=["baseline"],
+        )
+
+    with pytest.raises(MBEInputError, match="unknown ledger column"):
+        audit_metric(
+            df,
+            metric="proxy_metric",
+            target="target",
+            controls=["basline"],
+        )
+
+
+def test_csv_helper_writes_machine_readable_results(tmp_path):
+    csv_path = tmp_path / "runs.csv"
+    json_path = tmp_path / "audit.json"
+    synthetic_frame(n=80).to_csv(csv_path, index=False)
+
+    report = audit_csv(
+        csv_path,
+        metrics=["proxy_metric"],
+        target="target",
+        controls=["baseline"],
+        seed=42,
+        results=json_path,
+    )
+
+    assert len(report) == 1
+    assert '"metric":"proxy_metric"' in json_path.read_text(encoding="utf-8")

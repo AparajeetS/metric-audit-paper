@@ -19,6 +19,23 @@ Run package tests:
 python -m pytest -q
 ```
 
+Run the complete CPU-only credibility smoke test:
+
+```powershell
+.\reproduce_credibility.ps1
+```
+
+On Linux or macOS, use `./reproduce_credibility.sh`. Both scripts write smoke
+artifacts to the operating system's temporary directory, leaving the committed
+full-calibration evidence unchanged.
+
+The same check can run in the minimal reproduction container:
+
+```bash
+docker build -f Dockerfile.reproduction -t mbe-reproduction .
+docker run --rm mbe-reproduction
+```
+
 Run the CPU-only package demo:
 
 ```bash
@@ -26,6 +43,61 @@ mbe-eval-demo --bootstrap 200
 ```
 
 This writes `mbe_demo_report.md` and does not require GPU compute.
+
+## Calibrate The Audit On Known Cases
+
+Run the frozen synthetic calibration suite without GPU compute:
+
+```bash
+python experiments/08_protocol_calibration/run_calibration.py
+```
+
+This generates null, proxy, nonlinear-confounding, genuine-increment,
+Simpson-pooling, and post-treatment-control cases. The command exits nonzero if
+the declared audit profiles are not recovered.
+
+The broader comparator, power, and refit-aware inference checks live in
+`experiments/10_method_comparison/`. Protocol hashes, the machine-readable
+claim ledger, preregistration draft, and external-review packet live in
+`experiments/11_credibility_freeze/`.
+
+Regenerate the full inference stress matrix with:
+
+```bash
+python experiments/10_method_comparison/run_inference_stress.py \
+  --output-dir experiments/10_method_comparison/out
+```
+
+This is CPU-only but takes several minutes because every bootstrap draw refits
+the nuisance models.
+
+Regenerate manuscript tables with `python paper/build_tables.py`.
+
+An eligible external reviewer can execute the frozen audit with:
+
+```bash
+python experiments/12_independent_replication/run_replication_audit.py \
+  --reviewer "Full Name" \
+  --conflict-statement "No prior contribution; no protected outcomes seen" \
+  --output-dir external_replication_report
+```
+
+## Reaudit A Published Metric Study
+
+Published studies are ingested through frozen JSON manifests:
+
+```bash
+python experiments/09_published_metric_reaudit/run_reaudit.py \
+  path/to/study_manifest.json \
+  --output-prefix path/to/results/study_reaudit
+```
+
+See `experiments/09_published_metric_reaudit/study_manifest.example.json` for
+the schema. The runner fails on missing declared controls or duplicate row IDs.
+
+The PGDL external-checkpoint intake and frozen pilot are documented in
+`experiments/09_published_metric_reaudit/studies/pgdl2020/README.md`. HDF5
+checkpoint extraction requires the optional `h5py` package but no GPU.
 
 ## Regenerate MBE Tables From Saved CSVs
 

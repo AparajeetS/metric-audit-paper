@@ -21,6 +21,13 @@ the available analyses, and propose competing designs.
 | Compute budget | [`docs/COMPUTE_AND_COST_PLAN.md`](docs/COMPUTE_AND_COST_PLAN.md) | Minimum and recommended estimates |
 | Grant execution plan | [`GRANT_EXECUTION_PLAN.md`](GRANT_EXECUTION_PLAN.md) | Exact run matrix, holdout, budget ceilings, and deliverables |
 | Independent replication | [`docs/INDEPENDENT_REPLICATION_PROTOCOL.md`](docs/INDEPENDENT_REPLICATION_PROTOCOL.md) | Conflict, execution, acceptance, and reporting rules |
+| Synthetic calibration | [`experiments/08_protocol_calibration/`](experiments/08_protocol_calibration/) | Known-ground-truth MBE 2.0 protocol checks |
+| Published metric reaudit | [`experiments/09_published_metric_reaudit/`](experiments/09_published_metric_reaudit/) | Strict manifest schema and retrospective audit runner |
+| Conditional reliability protocol | [`docs/CONDITIONAL_METRIC_RELIABILITY_PROTOCOL.md`](docs/CONDITIONAL_METRIC_RELIABILITY_PROTOCOL.md) | Frozen atlas, selector, and abstention evaluation |
+| Audit service boundary | [`docs/METRIC_RELIABILITY_AUDIT_SERVICE.md`](docs/METRIC_RELIABILITY_AUDIT_SERVICE.md) | Open-core and private-audit product model |
+| Credibility ledger | [`docs/MBE_CREDIBILITY_LEDGER.md`](docs/MBE_CREDIBILITY_LEDGER.md) | Adversarial validation gates, failures, and blocked claims |
+| Shared method comparison | [`experiments/10_method_comparison/`](experiments/10_method_comparison/) | Source-faithful CMI/granulated criteria and known-truth benchmark |
+| Credibility freeze | [`experiments/11_credibility_freeze/`](experiments/11_credibility_freeze/) | Preregistration, file hashes, claim checks, and reviewer packet |
 | Citation metadata | [`CITATION.cff`](CITATION.cff) | Machine-readable citation |
 
 ## What Works Without New Compute
@@ -43,9 +50,10 @@ The public software and the scientific claim have different maturity levels:
 - **MBE v1 evidence:** exploratory and retained for provenance; it contains
   repeated configurations, and the legacy text setup is invalid as causal
   language-model evidence.
-- **MBE 2.0:** the active research program. Its nonlinear, cross-fitted,
-  multi-environment protocol is specified but is not yet fully implemented in
-  the released package or supported by submission-grade evidence.
+- **MBE 2.0:** the active research program. Its nonlinear, grouped cross-fitted
+  reference implementation, competing-method calibration, and refit-aware
+  uncertainty path are public. Protected transport and independent replication
+  are still incomplete, so submission-grade validation is not claimed.
 
 This distinction is intentional. Openness includes publishing negative results,
 known limitations, and unfinished validation work rather than presenting a

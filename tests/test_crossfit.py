@@ -107,5 +107,5 @@ def test_rank_transform_is_fitted_only_on_training_fold():
         pd.Series([-10.0, 0.0, 1.0, 10.0]),
     )
 
-    assert train_rank.tolist() == pytest.approx([0.25, 0.25, 0.625, 0.875])
-    assert test_rank.tolist() == pytest.approx([0.0, 0.25, 0.5, 1.0])
+    assert train_rank.tolist() == pytest.approx([0.375, 0.375, 0.75, 1.0])
+    assert test_rank.tolist() == pytest.approx([0.25, 0.375, 0.625, 1.0])
